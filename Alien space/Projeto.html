@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ALIEN SPACE - IYamada-Dev</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="wrap">
+  <div id="hud"><div>FASE <b id="phase">1</b>/5 SCORE <b id="score">0</b></div><div>VIDA <b id="lives">3</b> — <span id="power">—</span></div></div>
+  <canvas id="c" width="800" height="600"></canvas>
+  <div id="credit">desenvolvido por <b>IYamada-Dev</b></div>
+
+  <div id="start" class="screen"><div><h1>ALIEN<br>SPACE</h1><button class="btn" onclick="startGame()">INICIAR MISSÃO -></button></div></div>
+  <div id="gameover" class="screen hide"><div><h1>GAME OVER</h1><div style="margin-top:10px">SCORE <b id="finalScore">0</b></div><button class="btn" onclick="startGame()">TENTAR DE NOVO</button></div></div>
+  <div id="win" class="screen hide"><div><h1>VENCEU!</h1><div style="margin-top:10px">SCORE <b id="winScore">0</b></div><button class="btn" onclick="startGame()">JOGAR DE NOVO</button></div></div>
+
+  <div id="controls"><button id="left">◀◀</button><button id="shoot">ATIRAR</button><button id="right">▶▶</button></div>
+</div>
+<script src="script.js"></script>
+</body>
+</html>
