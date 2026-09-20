@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Speed Highway - IYamada-Dev</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="wrap">
+<canvas id="c" width="460" height="760"></canvas>
+<div id="menu">
+<h1>SPEED<br>HIGHWAY<b>RETRO RACER</b></h1>
+<div class="dev">DESENVOLVIDO POR IYAMADA-DEV</div>
+<div style="margin-top:14px;color:#fff;font-size:8px">DIFICULDADE:</div>
+<div class="btns" style="grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:8px">
+<div class="mbtn g sel" id="dFacil" onclick="setDif('facil')">FACIL</div>
+<div class="mbtn o" id="dMedio" onclick="setDif('medio')">MEDIO</div>
+<div class="mbtn pu" id="dDificil" onclick="setDif('dificil')">DIFICIL</div>
+</div>
+<div style="color:#aaa;font-size:6px;margin-top:6px" id="difDesc">+ LENTO / 3 VIDAS / PISTA LIVRE</div>
+<div class="btns">
+<div class="mbtn y" onclick="start()">JOGAR</div>
+<div class="mbtn bl" onclick="toggleOpt()">OPCOES</div>
+<div class="mbtn r" onclick="if(confirm('Sair do jogo?')) window.close();">SAIR</div>
+</div>
+<div id="opt">
+<p>COR:</p>
+<div style="display:flex;gap:8px;margin:8px 0">
+<div style="flex:1;height:32px;background:#1e90ff;border:3px solid #fff;cursor:pointer" onclick="setColor('azul')" title="Azul"></div>
+<div style="flex:1;height:32px;background:#ffeb3b;border:3px solid #fff;cursor:pointer" onclick="setColor('amarelo')" title="Amarelo"></div>
+<div style="flex:1;height:32px;background:#ff9ec8;border:3px solid #fff;cursor:pointer" onclick="setColor('rosa')" title="Rosa"></div>
+<div style="flex:1;height:32px;background:#c38cff;border:3px solid #fff;cursor:pointer" onclick="setColor('roxo')" title="Roxo"></div>
+</div>
+<p>VEICULO:</p>
+<div style="display:flex;gap:8px;margin:8px 0">
+<div class="mbtn" style="flex:1;padding:8px;font-size:7px" onclick="setVehicle('carro')">🚗 CARRO</div>
+<div class="mbtn" style="flex:1;padding:8px;font-size:7px" onclick="setVehicle('moto')">🏍️ MOTO</div>
+</div>
+<p>SOM: <span id="sState">LIGADO</span> - <span onclick="toggleSound()" style="text-decoration:underline;cursor:pointer">MUTAR</span></p>
+<div style="margin-top:6px;font-size:6px">ATUAL: <span id="cur">CARRO AZUL - FACIL</span></div>
+</div>
+</div>
+<div id="hud"><div>PTS <span id="pts">0</span></div><div>VEL <span id="vel">0</span></div><div id="mapName">NORMAL</div><div id="difHud">FACIL</div><div><span id="shield">3</span></div></div>
+<div id="nitro-label">NITRO</div>
+<div id="nitro"><div id="fill"></div></div>
+<div id="controls"><div class="arrow" id="leftBtn">◀</div><div class="arrow" id="rightBtn">▶</div></div>
+</div>
+<script src="script.js"></script>
+</body>
+  </html>
