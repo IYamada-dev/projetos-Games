@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>ALIEN SPACE —</title>
+<link href="https://fonts.googleapis.com/css2?family=Fragment+Mono&family=Syne:wght@800&display=swap" rel="stylesheet">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#08080A;color:#F3F1EB;font-family:'Fragment Mono',monospace;display:grid;place-items:center;height:100vh;overflow:hidden}
+  #wrap{position:relative;width:min(92vw, 800px);aspect-ratio:4/3;border:1px solid #ffffff18}
+  canvas{width:100%;height:100%;display:block;background:radial-gradient(120% 100% at 50% 0%, #15151A 0%, #08080A 70%)}
+.screen{position:absolute;inset:0;display:grid;place-items:center;background:#08080Ae6;backdrop-filter:blur(12px);z-index:5;text-align:center;padding:24px}
+.screen.hide{display:none}
+  h1{font-family:'Syne',sans-serif;font-size:clamp(48px, 11vw, 96px);line-height:.85;letter-spacing:-.05em}
+  h1 i{font-family:'Fragment Mono';font-weight:400;font-style:italic;font-size:.45em;vertical-align:middle;border:1px solid #fff;padding:4px 10px;border-radius:100px;margin-left:10px}
+.btn{margin-top:28px;background:#D4FF32;color:#000;border:none;padding:14px 28px;font-family:'Fragment Mono';font-size:12px;letter-spacing:.15em;cursor:pointer}
+.btn:active{transform:scale(.97)}
+  #hud{position:absolute;top:0;left:0;right:0;display:flex;justify-content:space-between;padding:12px 16px;font-size:10px;letter-spacing:.12em;z-index:2;pointer-events:none}
+  #hud b{color:#D4FF32}
+  #controls{position:absolute;bottom:-56px;left:0;right:0;display:flex;justify-content:space-between;gap:12px}
+  #controls button{flex:1;background:#121214;border:1px solid #ffffff15;color:#fff;padding:14px;font-family:'Fragment Mono';font-size:11px}
+.bar{width:120px;height:4px;background:#ffffff15;margin-top:6px;overflow:hidden}
+.bar-fill{height:100%;background:#D4FF32;width:100%;transition:.2s}
+</style>
+</head>
+<body>
+<div id="wrap">
+  <div id="hud">
+    <div>FASE <b id="phase">1</b> / 5 — SCORE <b id="score">0</b></div>
+    <div style="display:flex;gap:16px">
+      <div>VIDA <b id="lives">3</b></div>
+      <div>POWER <b id="power">—</b></div>
+    </div>
+  </div>
+  <canvas id="c" width="800" height="600"></canvas>
+
+  <div id="start" class="screen">
+    <div>
+      <h1>ALIEN<br>SPACE <i>5 FASES</i></h1>
+      <div style="margin-top:16px;font-size:11px;opacity:.6;line-height:1.6">
+        [A/D ou SETAS] MOVER — [ESPAÇO] ATIRAR<br>
+        POWER-UPS: <span style="color:#D4FF32">[2x]</span> TIRO DUPLO <span style="color:#5CFFB0">[L]</span> LASER <span style="color:#8FAFFF">[>>]</span> TURBO <span style="color:#FF8A5C">[O]</span> ESCUDO
+      </div>
+      <button class="btn" onclick="startGame()">INICIAR MISSÃO —></button>
+      <div style="margin-top:20px;font-size:9px;opacity:.3">BOSS FINAL NA FASE 5</div>
+    </div>
+  </div>
+
+  <div id="gameover" class="screen hide">
+    <div>
+      <h1 style="font-size:56px">GAME<br>OVER</h1>
+      <div style="margin-top:12px;font-size:11px">SCORE FINAL: <b id="finalScore">0</b></div>
+      <button class="btn" onclick="startGame()">TENTAR DE NOVO</button>
+    </div>
+  </div>
+
+  <div id="win" class="screen hide">
+    <div>
+      <h1 style="font-size:56px">VOCÊ<br>VENCEU</h1>
+      <div style="margin-top:12px;font-size:11px">CHEFÃO DESTRUÍDO — SCORE: <b id="winScore">0</b></div>
+      <button class="btn" onclick="startGame()">JOGAR DE NOVO</button>
+    </div>
+  </div>
+
+  <div id="controls">
+    <button id="left">◀◀</button>
+    <button id="shoot">ATIRAR [■]</button>
+    <button id="right">▶▶</button>
+  </div>
+</div>
+
+<script>
+const canvas=document.getElementById('c'), ctx=canvas.getContext('2d');
+let keys={}, score=0, lives=3, phase=1, gameState='menu';
+let player, bullets=[], enemies=[], eBullets=[], particles=[], powerups=[], boss=null;
+let powerType=null, powerTimer=0;
+let leftHold=false, rightHold=false, shootHold=false;
+const W=800,H=600;
+
+class Player{
+  constructor(){this.w=38;this.h=18;this.x=W/2-this.w/2;this.y=H-60;this.speed=5.5;this.cool=0; this.shield=0}
+  update(){
+    if(keys['ArrowLeft']||keys['a']||leftHold) this.x-=this.speed;
+    if(keys['ArrowRight']||keys['d']||rightHold) this.x+=this.speed;
+    this.x=Math.max(0,Math.min(W-this.w,this.x));
+    if(this.cool>0) this.cool--;
+    if(this.shield>0) this.shield--;
+  }
+  draw(){
+    ctx.fillStyle='#F3F1EB';
+    ctx.fillRect(this.x+12,this.y,14,6);
+    ctx.fillRect(this.x,this.y+6,this.w,10);
+    ctx.fillStyle='#D4FF32'; ctx.fillRect(this.x+16,this.y+12,6,6);
+    if(this.shield>0){
+      ctx.strokeStyle=`rgba(255,138,92,${0.3+Math.sin(Date.now()/80)*0.2})`;
+      ctx.lineWidth=2; ctx.beginPath(); ctx.arc(this.x+this.w/2,this.y+this.h/2, 28+Math.sin(Date.now()/100)*2,0,Math.PI*2); ctx.stroke();
+    }
+  }
+  shoot(){
+    if(this.cool>0) return;
+    if(powerType==='laser'){ bullets.push(new Bullet(this.x+this.w/2-2,this.y,0,-18,true)); this.cool=2; return}
+    if(powerType==='double'){
+      bullets.push(new Bullet(this.x+4,this.y, -1, -9)); bullets.push(new Bullet(this.x+this.w-8,this.y, 1, -9));
+    } else {
+      bullets.push(new Bullet(this.x+this.w/2-2,this.y,0,-10));
+    }
+    this.cool= powerType==='double'?14:18;
+  }
+}
+class Bullet{constructor(x,y,vx,vy,isLaser){this.x=x;this.y=y;this.vx=vx;this.vy=vy;this.w=isLaser?6:4;this.h=isLaser?28:12;this.isLaser=isLaser;this.dead=false}
+ update(){this.x+=this.vx; this.y+=this.vy; if(this.y<-20||this.y>H+20) this.dead=true}
+ draw(){ctx.fillStyle=this.isLaser?'#5CFFB0':'#F3F1EB'; ctx.fillRect(this.x,this.y,this.w,this.h)} }
+class EBill{constructor(x,y,vx,vy){this.x=x;this.y=y;this.vx=vx;this.vy=vy;this.w=4;this.h=10;this.dead=false}
+ update(){this.x+=this.vx; this.y+=this.vy; if(this.y>H+20) this.dead=true}
+ draw(){ctx.fillStyle='#FF4D4D'; ctx.fillRect(this.x,this.y,this.w,this.h)} }
+
+class Enemy{
+  constructor(x,y,type){this.x=x;this.y=y;this.w=34;this.h=22;this.type=type;this.dead=false; this.shootCool=Math.random()*120+60}
+  update(dir,speed){this.x+=dir*speed; this.shootCool--; if(this.shootCool<=0 && Math.random()<0.015 + phase*0.008){ eBullets.push(new EBill(this.x+this.w/2,this.y+this.h, (Math.random()-.5)*1.2, 3+phase*0.4)); this.shootCool=90-Math.min(60,phase*12)} }
+  draw(){ctx.strokeStyle='#F3F1EB'; ctx.lineWidth=1; ctx.strokeRect(this.x,this.y,this.w,this.h); ctx.fillStyle='#F3F1EB'; ctx.font='10px Fragment Mono'; ctx.fillText(this.type,this.x+4,this.y+14)}
+}
+
+class Boss{
+  constructor(){this.x=W/2-90;this.y=60;this.w=180;this.h=70;this.hp=100+phase*40;this.maxHp=this.hp;this.dir=1;this.cool=0;this.dead=false}
+  update(){
+    this.x+=this.dir*(1.2+phase*0.3);
+    if(this.x<0||this.x>W-this.w) this.dir*=-1;
+    this.cool--; if(this.cool<=0){
+      if(Math.random()<0.5){ for(let i=0;i<5;i++) eBullets.push(new EBill(this.x+20+i*32,this.y+this.h, (Math.random()-.5)*2, 4)) }
+      else{ for(let a=-2;a<=2;a++) eBullets.push(new EBill(this.x+this.w/2,this.y+this.h, a*1.2, 4)) }
+      this.cool=45;
+    }
+  }
+  draw(){
+    ctx.fillStyle='#121214'; ctx.fillRect(this.x,this.y,this.w,this.h);
+    ctx.strokeStyle='#D4FF32'; ctx.lineWidth=2; ctx.strokeRect(this.x,this.y,this.w,this.h);
+    ctx.fillStyle='#D4FF32'; ctx.font='bold 12px Fragment Mono'; ctx.fillText('CHEFÃO',this.x+10,this.y+22);
+    ctx.fillStyle='#ffffff15'; ctx.fillRect(this.x,this.y-12,this.w,6);
+    ctx.fillStyle='#D4FF32'; ctx.fillRect(this.x,this.y-12,this.w*(this.hp/this.maxHp),6);
+  }
+}
+
+class PowerUp{
+  constructor(x,y){this.x=x;this.y=y;this.w=22;this.h=22;this.vy=1.6;this.dead=false; this.types=['double','laser','speed','shield']; this.t=this.types[Math.floor(Math.random()*4)]}
+  update(){this.y+=this.vy; if(this.y>H+30) this.dead=true; if(this.x<player.x+player.w && this.x+this.w>player.x && this.y<player.y+player.h && this.y+this.h>player.y){ applyPower(this.t); this.dead=true; }}
+  draw(){
+    const col={double:'#D4FF32',laser:'#5CFFB0',speed:'#8FAFFF',shield:'#FF8A5C'}[this.t];
+    ctx.strokeStyle=col; ctx.lineWidth=1.5; ctx.strokeRect(this.x,this.y,this.w,this.h);
+    ctx.fillStyle=col; ctx.font='10px Fragment Mono'; ctx.fillText({double:'2x',laser:'L',speed:'>>',shield:'O'}[this.t], this.x+5,this.y+15);
+  }
+}
+
+function applyPower(t){
+  powerType=t; powerTimer=600;
+  if(t==='speed') player.speed=9.5;
+  if(t==='shield') player.shield=600;
+  document.getElementById('power').innerText={double:'TIRO DUPLO',laser:'RAIO LASER',speed:'TURBO',shield:'ESCUDO'}[t];
+}
+
+function spawnPhase(p){
+  enemies=[]; eBullets=[]; powerups=[]; boss=null;
+  if(p<5){
+    const rows=2+Math.floor(p*0.8), cols=7+Math.floor(p*0.6);
+    for(let r=0;r<rows;r++) for(let c=0;c<cols;c++){
+      enemies.push(new Enemy(60+c*68, 60+r*46, p>3?'◉':'◐'));
+    }
+  } else {
+    boss=new Boss();
+  }
+}
+
+function reset(){
+  score=0; lives=3; phase=1; bullets=[]; eBullets=[]; particles=[]; powerups=[]; powerType=null; powerTimer=0;
+  player=new Player(); spawnPhase(phase); updateHUD();
+}
+
+function updateHUD(){
+  document.getElementById('phase').innerText=phase;
+  document.getElementById('score').innerText=score;
+  document.getElementById('lives').innerText=lives;
+  if(powerTimer<=0){ document.getElementById('power').innerText='—'; powerType=null; player.speed=5.5}
+}
+
+function startGame(){
+  reset(); gameState='playing';
+  document.getElementById('start').classList.add('hide');
+  document.getElementById('gameover').classList.add('hide');
+  document.getElementById('win').classList.add('hide');
+  requestAnimationFrame(loop);
+}
+
+let enemyDir=1, enemySpeed=0.6, edgeTimer=0;
+function loop(){
+  if(gameState!=='playing') return;
+  player.update();
+  if(keys[' ']||shootHold) player.shoot();
+  if(powerTimer>0){ powerTimer--; if(powerTimer<=0){ powerType=null; player.speed=5.5; document.getElementById('power').innerText='—'; } }
+
+  bullets.forEach(b=>b.update()); eBullets.forEach(b=>b.update()); powerups.forEach(p=>p.update());
+  if(boss){ boss.update(); } else {
+    let hitEdge=false;
+    enemies.forEach(e=>{ e.update(enemyDir, enemySpeed+phase*0.25); if(e.x<=0||e.x>=W-e.w) hitEdge=true });
+    if(hitEdge && edgeTimer<=0){ enemyDir*=-1; enemies.forEach(e=>e.y+=18); edgeTimer=10 }
+    if(edgeTimer>0) edgeTimer--;
+  }
+
+  bullets.forEach(b=>{
+    if(boss &&!boss.dead && b.x<boss.x+boss.w && b.x+b.w>boss.x && b.y<boss.y+boss.h && b.y+b.h>boss.y){
+      boss.hp-= b.isLaser?2:1; b.dead=true; score+=25;
+      if(boss.hp<=0){ boss.dead=true; score+=1000; phase++; if(phase>5){ winGame(); return } else { spawnPhase(phase); } }
+    }
+    enemies.forEach(e=>{
+      if(!e.dead && b.x<e.x+e.w && b.x+b.w>e.x && b.y<e.y+e.h && b.y+b.h>e.y){
+        e.dead=true; b.dead=true; score+=10+phase*2;
+        if(Math.random()<0.12) powerups.push(new PowerUp(e.x,e.y));
+        for(let i=0;i<6;i++) particles.push({x:e.x+e.w/2,y:e.y+e.h/2,vx:(Math.random()-.5)*6,vy:(Math.random()-.5)*6,life:20});
+      }
+    });
+  });
+
+  eBullets.forEach(b=>{
+    if(b.x<player.x+player.w && b.x+b.w>player.x && b.y<player.y+player.h && b.y+b.h>player.y){
+      if(player.shield>0){ b.dead=true; player.shield=0; }
+      else{ b.dead=true; lives--; if(lives<=0){ gameOver(); return } }
+    }
+  });
+
+  enemies=enemies.filter(e=>!e.dead); bullets=bullets.filter(b=>!b.dead); eBullets=eBullets.filter(b=>!b.dead); powerups=powerups.filter(p=>!p.dead);
+  particles.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.life--}); particles=particles.filter(p=>p.life>0);
+
+  if(!boss && enemies.length===0){ phase++; if(phase>5){ winGame(); return } spawnPhase(phase); }
+
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle='rgba(255,255,255,0.15)'; for(let i=0;i<40;i++){ ctx.fillRect((i*137)%W, (i*251+Date.now()*0.02)%H,1,1) }
+  player.draw(); bullets.forEach(b=>b.draw()); eBullets.forEach(b=>b.draw()); enemies.forEach(e=>e.draw()); powerups.forEach(p=>p.draw()); if(boss) boss.draw();
+  particles.forEach(p=>{ ctx.globalAlpha=p.life/20; ctx.fillStyle='#D4FF32'; ctx.fillRect(p.x,p.y,2,2); ctx.globalAlpha=1 });
+
+  updateHUD();
+  requestAnimationFrame(loop);
+}
+
+function gameOver(){ gameState='over'; document.getElementById('finalScore').innerText=score; document.getElementById('gameover').classList.remove('hide'); }
+function winGame(){ gameState='win'; document.getElementById('winScore').innerText=score; document.getElementById('win').classList.remove('hide'); }
+
+window.addEventListener('keydown', e=>{ keys[e.key.toLowerCase()]=true; keys[e.key]=true; if(e.key===' ') e.preventDefault() });
+window.addEventListener('keyup', e=>{ keys[e.key.toLowerCase()]=false; keys[e.key]=false });
+
+document.getElementById('left').addEventListener('touchstart',()=>leftHold=true); document.getElementById('left').addEventListener('touchend',()=>leftHold=false);
+document.getElementById('right').addEventListener('touchstart',()=>rightHold=true); document.getElementById('right').addEventListener('touchend',()=>rightHold=false);
+document.getElementById('shoot').addEventListener('touchstart',()=>shootHold=true); document.getElementById('shoot').addEventListener('touchend',()=>shootHold=false);
+document.getElementById('left').addEventListener('mousedown',()=>leftHold=true); document.getElementById('left').addEventListener('mouseup',()=>leftHold=false);
+document.getElementById('right').addEventListener('mousedown',()=>rightHold=true); document.getElementById('right').addEventListener('mouseup',()=>rightHold=false);
+document.getElementById('shoot').addEventListener('mousedown',()=>shootHold=true); document.getElementById('shoot').addEventListener('mouseup',()=>shootHold=false);
+</script>
+</body>
+</html>
