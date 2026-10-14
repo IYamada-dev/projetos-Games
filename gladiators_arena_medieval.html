@@ -1,0 +1,2450 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GLADIATORS ARENA - Revolution Edition</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@900&family=Fragment+Mono&family=UnifrakturMaguntia&display=swap" rel="stylesheet">
+<style>
+/* =====================================================================
+   GLADIATORS ARENA - Revolution Edition
+   Designed & coded by YAMADA DEV — 2026
+   Estilo medieval: pergaminho, madeira, ferro, sangue e ouro velho.
+   ===================================================================== */
+:root{
+  --parchment:#E8DCC6; --wood:#8B5A2B; --iron:#5C5C5C; --blood:#8B1A1A;
+  --darkwood:#2C1E13; --gold:#D4A574; --paper:#F5E9C9;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body{
+  font-family:'Fragment Mono','Courier New',monospace;
+  color:var(--darkwood);
+  overflow:hidden;
+  background-color:var(--paper);
+  background-image:
+    radial-gradient(ellipse at 18% 8%,rgba(255,255,255,.4),transparent 52%),
+    radial-gradient(ellipse at 85% 92%,rgba(139,90,43,.2),transparent 55%),
+    repeating-linear-gradient(90deg,rgba(139,90,43,.05) 0 2px,transparent 2px 7px),
+    repeating-linear-gradient(0deg,rgba(44,30,19,.035) 0 1px,transparent 1px 5px);
+}
+button{font-family:inherit;color:inherit}
+
+/* ---------- Madeira (textura reutilizável) ---------- */
+.wood{
+  background-color:var(--wood);
+  background-image:repeating-linear-gradient(90deg,#8B5A2B 0 18px,#7a4d22 18px 20px,#935f2f 20px 38px,#6f4520 38px 39px);
+}
+
+/* ---------- Telas ---------- */
+.screen{
+  position:fixed;inset:0;display:none;overflow:auto;padding:18px;
+  background:
+    radial-gradient(ellipse at 50% 12%,var(--paper) 0%,var(--parchment) 62%,#d8c9a8 100%);
+}
+.screen.on{display:flex}
+.screen > .inner{margin:auto;text-align:center;max-width:900px;width:100%}
+#sBattle{padding:0;flex-direction:column;overflow:auto;background:var(--darkwood)}
+
+/* ---------- Tipografia ---------- */
+.logo{
+  font-family:'Cinzel',Georgia,serif;font-weight:900;
+  font-size:clamp(40px,10vw,92px);line-height:.88;
+  color:var(--darkwood);text-shadow:3px 3px 0 var(--gold);
+}
+.sub{
+  font-family:'UnifrakturMaguntia','Old English Text MT',Georgia,serif;
+  font-size:clamp(26px,5vw,46px);color:var(--blood);margin-top:6px;
+}
+.title{font-family:'Cinzel',Georgia,serif;font-weight:900;letter-spacing:.06em;color:var(--darkwood);text-shadow:2px 2px 0 var(--gold)}
+.sig{
+  margin-top:18px;display:inline-block;font-size:10px;letter-spacing:.3em;
+  background:var(--darkwood);color:var(--parchment);
+  border:3px double var(--gold);padding:10px 16px;
+}
+.sig b{color:var(--gold)}
+
+/* ---------- Botões ---------- */
+.btn{
+  background:var(--blood);color:var(--paper);border:3px solid var(--darkwood);
+  padding:14px 28px;font-family:'Cinzel',Georgia,serif;font-weight:900;
+  letter-spacing:.14em;font-size:13px;cursor:pointer;
+  box-shadow:0 5px 0 var(--darkwood);transition:transform .08s,box-shadow .08s;
+}
+.btn:hover{filter:brightness(1.12)}
+.btn:active{transform:translateY(4px);box-shadow:0 1px 0 var(--darkwood)}
+.btn.ghost{background:var(--parchment);color:var(--darkwood);border-color:var(--wood);box-shadow:0 5px 0 var(--wood)}
+.btn:disabled{opacity:.45;cursor:not-allowed;filter:none}
+
+/* ---------- Cartões de pergaminho ---------- */
+.card{
+  background:var(--parchment);border:3px solid var(--wood);padding:12px;
+  box-shadow:0 4px 0 var(--wood),inset 0 0 22px rgba(139,90,43,.22);
+  text-align:left;
+}
+.card h4{font-family:'Cinzel',Georgia,serif;font-weight:900;font-size:12px;letter-spacing:.12em;margin-bottom:8px;border-bottom:2px solid var(--wood);padding-bottom:4px}
+
+/* ---------- Barras ---------- */
+.bar{height:15px;background:var(--darkwood);border:2px solid var(--wood);position:relative;margin-top:3px}
+.bar i{display:block;height:100%;transition:width .35s}
+.bar span{position:absolute;inset:0;text-align:center;font-size:9px;line-height:11px;color:var(--paper);text-shadow:1px 1px 0 #000}
+.bar.hp i{background:linear-gradient(#c23a3a,#8B1A1A)}
+.bar.sta i{background:linear-gradient(#e6bf90,#b98a52)}
+.bar.fav i{background:linear-gradient(#f0cf6a,#c19a2e)}
+.lbl{font-size:10px;letter-spacing:.1em;margin-top:7px;display:flex;justify-content:space-between}
+
+/* ---------- Tela inicial ---------- */
+.heroes{display:flex;gap:10px;justify-content:center;margin:26px 0 22px;flex-wrap:wrap}
+.hero{background:var(--parchment);border:3px solid var(--wood);padding:6px 6px 4px;box-shadow:0 4px 0 var(--wood)}
+.hero img{width:72px;height:72px;image-rendering:pixelated;display:block;background:linear-gradient(#e4cd9c,#d3b47c)}
+.hero small{display:block;font-size:8px;letter-spacing:.08em;margin-top:3px}
+.linInfo{margin-top:18px;font-size:11px;letter-spacing:.06em}
+.linInfo a{color:var(--blood);cursor:pointer;text-decoration:underline}
+
+/* ---------- Criação ---------- */
+.createGrid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:16px 0}
+.attr{padding:7px 0;border-bottom:1px dashed #a8906a}
+.attr .row{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.attr b{font-family:'Cinzel',Georgia,serif;font-size:12px;letter-spacing:.08em}
+.attr small{display:block;font-size:9px;opacity:.75;margin-top:2px}
+.step{display:flex;align-items:center;gap:8px}
+.step button{width:28px;height:28px;background:var(--paper);border:2px solid var(--wood);font-weight:700;cursor:pointer;font-size:15px}
+.step button:active{background:var(--gold)}
+.step span{min-width:22px;text-align:center;font-size:15px;font-weight:700}
+.nameIn{width:100%;padding:8px;background:var(--paper);border:2px solid var(--wood);font-family:inherit;font-size:13px;margin-bottom:8px;color:var(--darkwood)}
+.pts{font-size:13px;margin:6px 0}
+.pts b{font-size:20px;color:var(--blood)}
+.prev{display:flex;gap:12px;align-items:center;margin-bottom:8px}
+.prev img{width:96px;height:96px;image-rendering:pixelated;background:linear-gradient(#e4cd9c,#d3b47c);border:3px solid var(--wood)}
+.prev ul{list-style:none;font-size:11px;line-height:1.7}
+.scarItem{font-size:11px;padding:5px 0;border-bottom:1px dashed #a8906a}
+.scarItem b{color:var(--blood)}
+.scarItem em{display:block;font-style:normal;font-size:10px;opacity:.8}
+
+/* ---------- Batalha ---------- */
+.topbar{
+  height:46px;min-height:46px;display:flex;justify-content:space-between;align-items:center;gap:10px;
+  padding:0 78px 0 14px;color:var(--paper);border-bottom:3px solid var(--gold);
+  font-size:10px;letter-spacing:.14em;
+}
+.topbar .t{font-family:'Cinzel',Georgia,serif;font-weight:900;font-size:13px;text-shadow:1px 1px 0 var(--darkwood)}
+.main{flex:1;min-height:0;display:grid;grid-template-columns:292px 1fr}
+.left{
+  overflow:auto;padding:10px;display:flex;flex-direction:column;gap:10px;
+  background:var(--parchment);border-right:4px solid var(--wood);
+}
+.left .nm{font-family:'Cinzel',Georgia,serif;font-weight:900;font-size:15px}
+.left .gen{font-size:10px;opacity:.8;margin-bottom:4px}
+.stats{display:grid;grid-template-columns:repeat(5,1fr);gap:3px;margin-top:8px;text-align:center;font-size:9px}
+.stats div{background:var(--paper);border:1px solid var(--wood);padding:3px 0}
+.stats b{display:block;font-size:13px}
+.limb{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px dashed #a8906a;font-size:10px}
+.limb .ok{color:#2f6b2f;font-weight:700}
+.limb .lost{color:var(--blood);font-weight:700}
+.badge{display:inline-block;font-size:9px;background:var(--iron);color:var(--paper);padding:1px 5px;margin-left:4px}
+.miniScars{font-size:10px;line-height:1.5}
+
+.right{display:flex;flex-direction:column;min-height:0;min-width:0;
+  background-color:#3a2a1b;
+  background-image:repeating-linear-gradient(90deg,#3a2a1b 0 22px,#33241a 22px 24px)}
+.arenaWrap{flex:1 1 0;min-height:0;display:flex;align-items:center;justify-content:center;padding:10px;position:relative;z-index:1;overflow:hidden}
+#arena{
+  display:grid;grid-template-columns:repeat(10,1fr);grid-template-rows:repeat(6,1fr);gap:2px;padding:6px;
+  background:repeating-linear-gradient(0deg,#4d4d4d 0 14px,#454545 14px 16px);
+  border:6px solid var(--iron);outline:3px solid var(--darkwood);
+  box-shadow:0 8px 0 rgba(0,0,0,.35);
+  width:100%;height:100%;
+}
+.cell{
+  position:relative;display:grid;place-items:center;min-width:0;min-height:0;cursor:default;
+  /* chão de areia com grãos */
+  background-color:#dcc490;
+  background-image:
+    radial-gradient(circle at 20% 30%,rgba(120,80,30,.28) 0 1px,transparent 1.6px),
+    radial-gradient(circle at 70% 62%,rgba(255,255,255,.35) 0 1px,transparent 1.6px),
+    radial-gradient(circle at 45% 82%,rgba(120,80,30,.22) 0 1px,transparent 1.6px),
+    linear-gradient(180deg,#e4cd9c,#d3b47c);
+  background-size:14px 14px,19px 19px,11px 11px,100% 100%;
+  box-shadow:inset 0 0 0 2px rgba(255,255,255,.1),inset 0 -4px 7px rgba(80,50,20,.22);
+}
+.cell.alt{background-color:#d3b47c;box-shadow:inset 0 0 0 2px rgba(255,255,255,.1),inset 0 -4px 7px rgba(80,50,20,.22),inset 0 0 0 60px rgba(110,70,25,.08)}
+/* telhas queimadas */
+.cell.fire{
+  background-image:
+    repeating-linear-gradient(0deg,rgba(30,10,5,.5) 0 2px,transparent 2px 9px),
+    repeating-linear-gradient(90deg,rgba(30,10,5,.5) 0 2px,transparent 2px 9px),
+    radial-gradient(ellipse at 50% 92%,#ffb43a 0%,#e0541b 45%,#8B1A1A 100%);
+  background-size:auto;filter:none;
+}
+.cell.fire::after{
+  content:'';position:absolute;inset:0;z-index:1;pointer-events:none;
+  background:radial-gradient(ellipse at 50% 100%,rgba(255,210,70,.6),transparent 70%);
+  animation:flick .5s steps(2) infinite alternate;
+}
+@keyframes flick{0%{opacity:.35}100%{opacity:1}}
+.cell.pillar{
+  background-image:linear-gradient(135deg,#7a7a7a,#4d4d4d 60%,#3a3a3a);
+  box-shadow:inset 0 0 0 2px var(--darkwood);filter:none;
+}
+.blk{font-size:clamp(20px,5.2vw,56px);line-height:1;color:#8c8c8c;text-shadow:2px 2px 0 #1e1e1e;z-index:2}
+.blk.new{animation:drop .5s ease-in}
+@keyframes drop{0%{transform:translateY(-160%);opacity:.2}70%{transform:translateY(8%);opacity:1}100%{transform:translateY(0)}}
+.cell.reach{cursor:pointer}
+.cell.reach::before{content:'';position:absolute;inset:0;z-index:3;background:rgba(212,165,116,.45);outline:2px dashed var(--darkwood);outline-offset:-3px}
+.cell.tgt{outline:3px solid var(--blood);outline-offset:-3px;z-index:3}
+.cell.burst::before{content:'';position:absolute;inset:0;z-index:4;background:radial-gradient(circle,#fff1a8,#ff8c2a 45%,transparent 72%);animation:burst .5s ease-out forwards}
+@keyframes burst{0%{opacity:0;transform:scale(.3)}40%{opacity:1}100%{opacity:0;transform:scale(1.5)}}
+
+/* ---------- Sprites ---------- */
+.spr{position:relative;width:96%;aspect-ratio:1;pointer-events:none;z-index:2}
+.spr.flip{transform:scaleX(-1)}
+.spr::before{content:'';position:absolute;left:18%;right:18%;bottom:3%;height:10%;background:rgba(44,30,19,.38);border-radius:50%}
+.spr .mv{position:relative;width:100%;height:100%}
+.spr img{width:100%;height:100%;image-rendering:pixelated;display:block;animation:bob .8s steps(2,end) infinite alternate}
+@keyframes bob{0%{transform:translateY(0)}100%{transform:translateY(-4%)}}
+.spr.lunge .mv{animation:lunge .28s ease-out}
+@keyframes lunge{50%{transform:translateX(38%)}}
+.spr.hit img{animation:flash .4s steps(1,end) 1}
+@keyframes flash{0%,100%{filter:none}50%{filter:brightness(1.7) sepia(1) saturate(8) hue-rotate(-35deg)}}
+.spr.dead img{animation:die 1.4s forwards}
+@keyframes die{0%{filter:none;opacity:1}30%{filter:brightness(2.5)}100%{filter:grayscale(1);opacity:0;transform:translateY(14%) rotate(80deg)}}
+.float{
+  position:absolute;left:50%;top:6%;z-index:6;pointer-events:none;white-space:nowrap;
+  font-family:'Cinzel',Georgia,serif;font-weight:900;font-size:clamp(11px,2vw,20px);color:#fff;
+  text-shadow:-1px -1px 0 #2C1E13,1px -1px 0 #2C1E13,-1px 1px 0 #2C1E13,1px 1px 0 #2C1E13;
+  animation:rise 1.1s ease-out forwards;
+}
+.float.dmg{color:#ff6b5a}.float.crit{color:#ffd24a;font-size:clamp(13px,2.4vw,24px)}
+.float.heal{color:#8be28b}.float.fire{color:#ffa94a}.float.info{color:var(--paper)}
+@keyframes rise{0%{opacity:0;transform:translate(-50%,10px)}15%{opacity:1}100%{opacity:0;transform:translate(-50%,-38px)}}
+
+/* ---------- Log e ações ---------- */
+.log{position:relative;z-index:2;flex:none;height:112px;min-height:112px;background:var(--darkwood);color:var(--parchment);padding:8px 10px;overflow-y:auto;font-size:11px;border-top:3px solid var(--gold);line-height:1.45}
+.log .l-hit{color:#f3d9a0}.log .l-dmg{color:#ff9a8a}.log .l-heal{color:#9fe29f}
+.log .l-sys{color:var(--gold)}.log .l-crowd{color:#e8c46a;font-style:italic}.log .l-fire{color:#ffb066}.log .l-crit{color:#ffd24a;font-weight:700}
+.actionBar{position:relative;z-index:2;flex:none;display:flex;gap:6px;padding:9px;background:var(--parchment);border-top:3px solid var(--wood);flex-wrap:wrap;justify-content:center}
+.abtn{
+  background:var(--paper);border:3px solid var(--wood);padding:8px 10px;
+  font-family:'Cinzel',Georgia,serif;font-weight:900;font-size:10px;letter-spacing:.06em;
+  cursor:pointer;min-width:94px;box-shadow:0 3px 0 var(--wood);
+}
+.abtn small{display:block;font-family:'Fragment Mono',monospace;font-weight:400;font-size:9px;opacity:.75;margin-top:2px}
+.abtn:hover:not(:disabled){background:var(--gold)}
+.abtn:active:not(:disabled){transform:translateY(3px);box-shadow:none}
+.abtn.on{background:var(--gold);border-color:var(--blood)}
+.abtn:disabled{opacity:.4;cursor:not-allowed}
+
+/* ---------- Modal ---------- */
+.modal{position:absolute;inset:0;background:rgba(44,30,19,.78);display:none;align-items:center;justify-content:center;padding:16px;z-index:50}
+.modal.on{display:flex}
+.mbox{max-width:520px;text-align:center}
+.mbox p{margin:10px 0;font-size:12px;line-height:1.5}
+.blessRow{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:10px}
+.blessRow .btn{padding:9px 12px;font-size:11px}
+
+/* ---------- Morte / Vitória ---------- */
+.endCard{max-width:560px;margin:auto;text-align:center}
+.endCard .title{font-size:clamp(28px,6vw,46px);margin-bottom:6px}
+.endCard p{font-size:12px;line-height:1.55;margin:8px 0}
+.endCard .card{margin:12px 0}
+.deathRed{color:var(--blood)}
+
+/* ---------- Som ---------- */
+.muteBtn{position:fixed;top:7px;right:8px;z-index:100;background:var(--parchment);border:2px solid var(--darkwood);color:var(--darkwood);
+  font-family:'Cinzel',Georgia,serif;font-weight:900;font-size:9px;letter-spacing:.08em;padding:5px 8px;cursor:pointer;box-shadow:0 2px 0 var(--darkwood)}
+.muteBtn.off{background:var(--blood);color:var(--paper)}
+.soundHint{margin-top:14px;font-size:10px;letter-spacing:.12em;color:var(--blood);animation:flick .9s steps(2) infinite alternate}
+
+/* ---------- Responsivo ---------- */
+@media (max-width:820px){
+  body{overflow:auto}
+  .main{display:flex;flex-direction:column;flex:none;min-height:auto}
+  .left{flex:none;border-right:0;border-bottom:4px solid var(--wood);max-height:30vh}
+  .right{flex:none;min-height:auto}
+  .arenaWrap{flex:none;overflow:visible}
+  #arena{width:100%;min-width:0}
+  .arenaBox{width:100%;min-width:0}
+  .createGrid{grid-template-columns:1fr}
+  .topbar .t{font-size:11px}
+}
+@media (prefers-reduced-motion:reduce){
+  .spr img,.cell.fire::after{animation:none}
+}
+/* ---------- Novidades: bandeiras, aparência, barras, dia/noite ---------- */
+.flags{display:flex;gap:12px;justify-content:center;margin:20px 0 4px}
+.flag{width:54px;height:36px;border:3px solid var(--wood);padding:0;cursor:pointer;background:none;box-shadow:0 3px 0 var(--wood);opacity:.65;transition:transform .1s,opacity .1s}
+.flag svg{display:block;width:100%;height:100%}
+.flag:hover{opacity:1}
+.flag.on{opacity:1;border-color:var(--blood);box-shadow:0 3px 0 var(--blood);transform:translateY(-3px)}
+.createGrid .span2{grid-column:1/-1}
+.lk{display:flex;align-items:center;gap:6px;margin:6px 0;font-size:10px;flex-wrap:wrap}
+.lk>span{min-width:66px;font-weight:700;letter-spacing:.05em}
+.swb{width:20px;height:20px;border:2px solid var(--darkwood);cursor:pointer;padding:0}
+.swb.on{outline:3px solid var(--blood);outline-offset:1px}
+.lk input[type=color]{width:30px;height:24px;border:2px solid var(--wood);padding:0;background:none;cursor:pointer}
+.tgl{font-family:'Cinzel',Georgia,serif;font-weight:900;font-size:10px;padding:4px 9px;border:2px solid var(--wood);background:var(--paper);cursor:pointer;color:var(--darkwood)}
+.tgl.on{background:var(--gold);border-color:var(--blood)}
+.homeBtn{background:var(--parchment);border:2px solid var(--darkwood);color:var(--darkwood);font-family:'Cinzel',Georgia,serif;font-weight:900;font-size:10px;letter-spacing:.06em;padding:4px 9px;cursor:pointer;box-shadow:0 2px 0 var(--darkwood)}
+.homeBtn:hover{background:var(--gold)}
+#topInfo{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;text-align:right;flex:1}
+.arenaBox{position:relative;width:min(100%,calc((100vh - 330px) * 1.55));min-width:240px;aspect-ratio:10/6}
+.tod{position:absolute;inset:0;z-index:4;pointer-events:none;mix-blend-mode:multiply;background-color:#fff;transition:background-color 2.2s}
+.todBanner{position:absolute;left:0;right:0;top:36%;text-align:center;z-index:30;pointer-events:none;opacity:0;
+  font-family:'Cinzel',Georgia,serif;font-weight:900;font-size:clamp(20px,5vw,46px);color:var(--paper);
+  text-shadow:3px 3px 0 var(--darkwood),-1px -1px 0 var(--darkwood)}
+.todBanner.show{animation:banner 2.8s ease-out}
+@keyframes banner{0%{opacity:0;transform:scale(.9)}15%{opacity:1;transform:scale(1)}75%{opacity:1}100%{opacity:0}}
+.cell.occ{z-index:5}
+.tod-night .spr .mv{filter:brightness(.86) saturate(.95)}
+.tod-dusk .spr .mv{filter:sepia(.2) saturate(1.15)}
+.mini{position:absolute;left:12%;right:12%;top:-2%;display:flex;flex-direction:column;gap:1px;z-index:3}
+.spr.flip .mini{transform:scaleX(-1)}
+.mini b{display:block;height:5px;background:var(--darkwood);border:1px solid #000;position:relative}
+.mini b+b{height:3px}
+.mini b i{display:block;height:100%;transition:width .3s}
+.mini .h{background:#c23a3a;width:100%}
+.mini .s{background:#e6bf90;width:100%}
+.spr.dead .mini{display:none}
+@media (max-width:820px){ .mini b{height:4px} .mini b+b{height:2px} .homeBtn{font-size:9px;padding:3px 6px} }
+/* ---------- Clima, terreno, plateia, impacto, ferimentos ---------- */
+.arenaCol{display:flex;flex-direction:column;width:min(100%,calc((100vh - 372px) * 1.55));min-width:240px}
+.arenaBox{width:100%;min-width:0}
+#stands{display:block;width:100%;height:46px;background:#2b1d12;border:4px solid var(--iron);border-bottom:0}
+.fxCv{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:9}
+.arenaCol.tod-night #stands{filter:brightness(.6) saturate(.8)}
+.arenaCol.tod-dusk #stands{filter:sepia(.3) saturate(1.2)}
+.arenaCol.tod-dawn #stands{filter:brightness(.95) sepia(.12)}
+.torch{position:absolute;width:20px;height:34px;z-index:9;opacity:0;transition:opacity 1.5s;pointer-events:none;
+  background:radial-gradient(ellipse at 50% 85%,#fff1a8,#ff9a2a 40%,transparent 72%);animation:flick .35s steps(2) infinite alternate}
+.torch.tl{left:-12px;top:-16px}.torch.tr{right:-12px;top:-16px}.torch.bl{left:-12px;bottom:-14px}.torch.br{right:-12px;bottom:-14px}
+.arenaCol.tod-night .torch,.arenaCol.tod-dusk .torch{opacity:.95}
+/* terreno */
+.cell.mud{
+  background-image:
+    radial-gradient(ellipse at 50% 38%,rgba(255,255,255,.2) 0 7%,transparent 17%),
+    radial-gradient(circle at 25% 72%,rgba(35,20,8,.55) 0 10%,transparent 22%),
+    linear-gradient(180deg,#6e4c2b,#4d341c);
+  background-size:100% 100%;
+}
+.cell.drift{
+  background-image:
+    radial-gradient(ellipse at 50% 85%,rgba(255,255,255,.4),transparent 60%),
+    repeating-linear-gradient(8deg,rgba(255,255,255,.18) 0 2px,transparent 2px 7px),
+    linear-gradient(180deg,#efdbb0,#dcc08a);
+  background-size:100% 100%;
+}
+/* peso nos golpes */
+.arenaBox.shake1{animation:shk1 .3s}
+.arenaBox.shake2{animation:shk2 .36s}
+.arenaBox.shake3{animation:shk3 .4s}
+@keyframes shk1{0%,100%{transform:translate(0)}20%{transform:translate(-2px,1px)}40%{transform:translate(2px,-1px)}60%{transform:translate(-1px,2px)}80%{transform:translate(1px,-1px)}}
+@keyframes shk2{0%,100%{transform:translate(0)}15%{transform:translate(-5px,2px)}35%{transform:translate(5px,-3px)}55%{transform:translate(-4px,3px)}75%{transform:translate(3px,-2px)}}
+@keyframes shk3{0%,100%{transform:translate(0) rotate(0)}12%{transform:translate(-8px,3px) rotate(-.5deg)}30%{transform:translate(8px,-4px) rotate(.5deg)}50%{transform:translate(-6px,4px) rotate(-.3deg)}70%{transform:translate(5px,-3px) rotate(.3deg)}}
+.arenaBox.zoom{animation:zoomp .28s}
+@keyframes zoomp{0%,100%{transform:scale(1)}40%{transform:scale(1.035)}}
+.arenaBox.freeze *{animation-play-state:paused !important}
+.spr.lunge .mv{animation:lunge .32s ease-out}
+@keyframes lunge{0%{transform:translateX(0)}30%{transform:translateX(-14%)}55%{transform:translateX(50%)}100%{transform:translateX(0)}}
+.spr.knock .mv{animation:knock .3s ease-out}
+@keyframes knock{0%{transform:translateX(0)}35%{transform:translateX(-24%) scale(1.06)}100%{transform:translateX(0)}}
+.float.big{font-size:clamp(15px,3vw,28px)}
+/* partículas, sangue e projéteis */
+.pt{position:absolute;pointer-events:none;z-index:7;left:50%;top:50%;border-radius:50%;animation:ptfly .6s ease-out forwards}
+.pt.blood{width:5px;height:5px;background:#8B1A1A}
+.pt.spark{width:3px;height:3px;background:#ffe27a}
+.pt.ember{width:4px;height:4px;background:#ff8c2a}
+.pt.limb{width:14px;height:6px;border-radius:2px;animation:limbfly .9s ease-out forwards}
+@keyframes ptfly{0%{transform:translate(-50%,-50%) scale(1);opacity:1}100%{transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy))) scale(.4);opacity:0}}
+@keyframes limbfly{0%{transform:translate(-50%,-50%) rotate(0)}40%{transform:translate(calc(-50% + var(--dx)*.6),-60px) rotate(180deg)}100%{transform:translate(calc(-50% + var(--dx)),10px) rotate(420deg);opacity:.2}}
+.stain{position:absolute;z-index:1;pointer-events:none;border-radius:50%;background:radial-gradient(ellipse,rgba(110,15,15,.78),rgba(110,15,15,.35) 55%,transparent 72%)}
+.proj{position:absolute;z-index:20;pointer-events:none;transition:left .45s cubic-bezier(.3,.1,.7,.9),top .45s cubic-bezier(.3,.1,.7,.9);animation:projspin .45s linear}
+@keyframes projspin{to{transform:rotate(360deg)}}
+.proj.stone{width:11px;height:11px;border-radius:50%;background:#777;border:1px solid #333}
+.proj.bread{width:15px;height:9px;border-radius:50%;background:#c58a45;border:1px solid #6b4423}
+.proj.potion{width:8px;height:13px;background:#c23a3a;border:1px solid #fff;border-radius:2px 2px 5px 5px}
+/* derrotado (esperando o veredito) */
+.spr.down img{animation:none;transform:rotate(78deg) translate(8%,-4%);filter:grayscale(.6) brightness(.8)}
+.spr.down .mini{display:none}
+.thumb{font-size:58px;margin:4px 0;line-height:1.1}
+@media (max-width:820px){ .arenaCol{width:100%;min-width:0} }
+/* ---------- Modos, status, Legado, aviso ---------- */
+.modes{display:flex;gap:8px;flex-wrap:wrap}
+.tgl.mode{padding:8px 12px;font-size:11px}
+.modeInfo{font-size:11px;margin-top:8px;line-height:1.5}
+.legGrid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.legGrid .span2{grid-column:1/-1}
+.perk{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px dashed #a8906a;font-size:11px}
+.perk b{font-family:'Cinzel',Georgia,serif;font-size:12px}
+.perk em{display:block;font-style:normal;font-size:10px;opacity:.8;margin-top:2px}
+.perk .btn{padding:7px 10px;font-size:10px;white-space:nowrap}
+.ach{padding:6px 0;border-bottom:1px dashed #a8906a;font-size:11px}
+.ach.lock{opacity:.45}
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(30px);background:var(--darkwood);color:var(--paper);
+  border:3px double var(--gold);padding:10px 16px;font-size:11px;z-index:200;opacity:0;transition:all .4s;pointer-events:none;text-align:center;max-width:90vw}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.sbadge{display:inline-block;font-size:9px;margin:3px 3px 0 0;padding:1px 6px;color:#fff;font-weight:700}
+.sbadge.bleed{background:#8B1A1A}.sbadge.burn{background:#d2691e}.sbadge.stun{background:#5C5C5C}.sbadge.combo{background:#c9a227;color:#2C1E13}
+.actionBar .abtn{min-width:80px;padding:7px 7px}
+@media (max-width:820px){ .legGrid{grid-template-columns:1fr} }
+</style>
+</head>
+<body>
+
+<button class="muteBtn" id="muteBtn" onclick="toggleMute()" aria-label="Sound">SOM ON</button>
+
+<!-- ============================== TELA: INÍCIO ============================== -->
+<section class="screen on" id="sStart"><div class="inner">
+  <div class="logo">GLADIATORS<br>ARENA</div>
+  <div class="sub">revolution edition</div>
+  <div class="sig">DESIGNED &amp; CODED BY <b>YAMADA DEV</b> — 𒉭 — 2026</div>
+  <div class="flags" id="flags"></div>
+  <div class="heroes" id="heroRow"></div>
+  <button class="btn" onclick="goCreate()" data-i18n="enter">ENTRAR NA ARENA →</button>
+  <div style="height:12px"></div>
+  <button class="btn ghost" id="legBtn" onclick="goLegacy()">LEGADO</button>
+  <div class="linInfo" id="startLin"></div>
+  <div class="soundHint" id="soundHint" data-i18n="soundHint">♪ Toque em qualquer lugar para ativar o som</div>
+</div></section>
+
+<!-- ============================== TELA: CRIAÇÃO ============================== -->
+<section class="screen" id="sCreate"><div class="inner">
+  <div class="title" style="font-size:clamp(26px,5vw,38px)" data-i18n="createTitle">FORJE SEU GLADIADOR</div>
+  <div class="createGrid">
+    <div class="card span2"><h4 data-i18n="modeTitle">MODO DE JOGO</h4><div id="modeBox"></div></div>
+    <div class="card">
+      <input class="nameIn" id="nameIn" maxlength="16" data-i18n-ph="namePh" placeholder="Nome do gladiador" value="Gladiador">
+      <div class="pts"><span data-i18n="ptsLeft">Pontos restantes:</span> <b id="pts">25</b> / <span id="ptsMax">25</span></div>
+      <div id="attrList"></div>
+      <div style="display:flex;gap:8px;margin-top:10px">
+        <button class="btn ghost" style="padding:8px 12px;font-size:10px" onclick="balanced()" data-i18n="balanced">EQUILIBRADO</button>
+        <button class="btn ghost" style="padding:8px 12px;font-size:10px" onclick="resetAttr()" data-i18n="resetPts">ZERAR</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="prev"><img id="prevImg" alt=""><ul id="prevStats"></ul></div>
+      <h4 data-i18n="looks">APARÊNCIA</h4>
+      <div id="lookBox"></div>
+    </div>
+    <div class="card span2">
+      <h4 data-i18n="scarsTitle">CICATRIZES HERDADAS</h4>
+      <div id="scarBox"></div>
+    </div>
+  </div>
+  <div id="createHint" style="font-size:11px;min-height:16px;margin-bottom:8px;color:var(--blood)"></div>
+  <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+    <button class="btn ghost" onclick="toMenu()" data-i18n="back">← VOLTAR</button>
+    <button class="btn" onclick="startRun()" data-i18n="fight">LUTAR →</button>
+  </div>
+</div></section>
+
+<!-- ============================== TELA: BATALHA ============================== -->
+<section class="screen" id="sBattle">
+  <div class="topbar wood">
+    <div class="t">GLADIATORS ARENA</div>
+    <button class="homeBtn" id="homeBtn" onclick="leaveToStart()" data-i18n="home">INÍCIO</button>
+    <div id="topInfo"></div>
+  </div>
+  <div class="main">
+    <aside class="left" id="left"></aside>
+    <div class="right">
+      <div class="arenaWrap">
+        <div class="arenaCol tod-day" id="arenaCol">
+          <canvas id="stands"></canvas>
+          <div class="arenaBox" id="arenaBox">
+            <div id="arena"></div>
+            <div class="tod" id="tod"></div>
+            <canvas class="fxCv" id="fxCv"></canvas>
+            <div class="torch tl"></div><div class="torch tr"></div><div class="torch bl"></div><div class="torch br"></div>
+            <div class="todBanner" id="todBanner"></div>
+          </div>
+        </div>
+      </div>
+      <div class="log" id="log"></div>
+      <div class="actionBar" id="actions"></div>
+    </div>
+  </div>
+  <div class="modal" id="modal"></div>
+</section>
+
+<!-- ============================== TELA: LEGADO ============================== -->
+<section class="screen" id="sLegacy"><div class="inner">
+  <div class="title" style="font-size:clamp(26px,5vw,38px)" data-i18n="legacyTitle">LEGADO DA LINHAGEM</div>
+  <div class="card" id="legHead" style="margin:14px 0"></div>
+  <div class="legGrid">
+    <div class="card"><h4 data-i18n="perksTitle">HABILIDADES ANCESTRAIS</h4><div id="perkBox"></div></div>
+    <div class="card"><h4 data-i18n="achTitle">CONQUISTAS</h4><div id="achBox"></div></div>
+    <div class="card span2"><h4 data-i18n="hallTitle">GALERIA DE LENDAS</h4><div id="hallBox"></div></div>
+  </div>
+  <button class="btn ghost" style="margin-top:16px" onclick="toMenu()" data-i18n="back">← VOLTAR</button>
+</div></section>
+
+<!-- ============================== TELA: MORTE ============================== -->
+<section class="screen" id="sDeath"><div class="endCard" id="deathBox"></div></section>
+
+<!-- ============================== TELA: VITÓRIA ============================== -->
+<section class="screen" id="sWin"><div class="endCard" id="winBox"></div></section>
+
+<div class="toast" id="toast"></div>
+
+<script>
+'use strict';
+/* =====================================================================
+   1. CONSTANTES E DADOS
+   ===================================================================== */
+const COLS = 10, ROWS = 6;
+const COST = { move:5, attack:12, defend:8, magic:18, taunt:10, heavy:20, quick:14, dodge:10 };
+const ATK_RANGE = 1.5, MAGIC_RANGE = 3.2, BASE_MOVE = 1.6, FAST_MOVE = 2.3;
+const FIRE_EVERY = 6, PILLAR_EVERY = 8, FIRE_STOP_COL = 4;   // coluna 5 (índice 4)
+const FIRE_DMG = 20, CROWD_STONE_CHANCE = .15, DISMEMBER_CHANCE = .18;
+const POOL = 25, MAX_SCARS = 5;
+
+const LIMB_MAX = { armR:30, armL:30, legR:35, legL:35 };
+const ATTR_KEYS = ['pow','agi','vit','cha','end'];
+
+/* Os 4 campeões, em ordem. HP e Power crescem a cada nível. Nomes/títulos vêm das traduções. */
+const CHAMPS = [
+  { id:'thrax',    hp:80,  pow:3,  agi:4,  sta:70,  ai:'brute' },
+  { id:'lysandra', hp:100, pow:5,  agi:9,  sta:80,  ai:'agile' },
+  { id:'aldric',   hp:135, pow:6,  agi:3,  sta:90,  ai:'knight',    counterOnGuard:true },
+  { id:'zahra',    hp:95,  pow:7,  agi:7,  sta:120, ai:'mage',      burnOnFire:.6 },
+  { id:'pillar',   hp:170, pow:8,  agi:1,  sta:80,  ai:'tank',      stunRes:1 },
+  { id:'gorm',     hp:230, pow:8,  agi:3,  sta:90,  ai:'berserker', stunRes:.5 },
+  { id:'nyx',      hp:120, pow:9,  agi:10, sta:100, ai:'assassin',  dodge:.25, bleedOnHit:.55, moveBonus:.9 },
+  { id:'antares',  hp:220, pow:10, agi:6,  sta:110, ai:'emperor',   stunRes:.5 }
+];
+/* Dia e noite: um período do dia para cada combate. 'c' tinge a arena (multiply). */
+const TOD = [
+  { id:'day',   c:'#ffffff', ic:'☀' },
+  { id:'dusk',  c:'#ffb27a', ic:'◑' },
+  { id:'night', c:'#6372b4', ic:'☾' },
+  { id:'dawn',  c:'#ffd0c8', ic:'◐' }
+];
+/* Cicatrizes (herança entre gerações). Textos vêm das traduções. */
+const SCARS = {
+  fire:  { mod:{ fireRes:.2, pow:1, hp:-5 } },
+  blade: { mod:{ hp:5, pow:1, agi:-1 } },
+  stone: { mod:{ cha:3 } }
+};
+
+/* =====================================================================
+   3. UTILIDADES
+   ===================================================================== */
+const $ = id => document.getElementById(id);
+const rnd = (a,b) => Math.floor(Math.random()*(b-a+1))+a;
+const clamp = (v,a,b) => Math.max(a,Math.min(b,v));
+const dist = (a,b) => Math.hypot(a.c-b.c, a.r-b.r);
+const inB = (c,r) => c>=0 && c<COLS && r>=0 && r<ROWS;
+/* clareia (a>0) ou escurece (a<0) uma cor #rrggbb */
+function shade(hex,a){
+  const n = parseInt(hex.slice(1),16); let r=n>>16, g=(n>>8)&255, b=n&255;
+  const f = a<0 ? 0 : 255, p = Math.abs(a);
+  r=Math.round(r+(f-r)*p); g=Math.round(g+(f-g)*p); b=Math.round(b+(f-b)*p);
+  return '#'+((1<<24)+(r<<16)+(g<<8)+b).toString(16).slice(1);
+}
+
+/* =====================================================================
+   4. SPRITES PIXEL ART 64x64 (desenhados por código, estilo 16-bit)
+   ===================================================================== */
+const OUT = [26,15,8];
+function outline(g){
+  const im = g.getImageData(0,0,64,64), d = im.data, src = new Uint8ClampedArray(d);
+  const a = (x,y) => (x<0||y<0||x>63||y>63) ? 0 : src[(y*64+x)*4+3];
+  for(let y=0;y<64;y++) for(let x=0;x<64;x++){
+    if(a(x,y)===0 && (a(x-1,y)||a(x+1,y)||a(x,y-1)||a(x,y+1))){
+      const i=(y*64+x)*4; d[i]=OUT[0]; d[i+1]=OUT[1]; d[i+2]=OUT[2]; d[i+3]=255;
+    }
+  }
+  g.putImageData(im,0,0);
+}
+function sprite(draw){
+  const c = document.createElement('canvas'); c.width = c.height = 64;
+  const g = c.getContext('2d'); g.imageSmoothingEnabled = false;
+  const R = (x,y,w,h,col) => { g.fillStyle = col; g.fillRect(x,y,w,h); };
+  draw(R);
+  outline(g);
+  return c.toDataURL();
+}
+const NOLOST = { armR:false, armL:false, legR:false, legL:false };
+const BLD = '#8B1A1A', BLD2 = '#c23a3a';
+/* Corpo humanoide base (virado para a direita). o.L marca os membros perdidos:
+   armR = braço da frente (arma), armL = braço de trás, legR = perna da frente, legL = perna de trás. */
+function humanoid(R,o){
+  const L = o.L || NOLOST;
+  if(!L.armL) R(18,28,6,16,o.skinD); else { R(20,28,4,3,o.skinD); R(20,31,4,2,BLD); R(21,34,2,2,BLD2); }
+  if(!L.legL){ R(24,44,7,14,o.legs); R(24,44,2,14,o.legsD); R(23,56,9,5,o.boots); }
+  else { R(24,44,7,4,o.legs); R(24,48,7,2,BLD); R(25,51,2,2,BLD2); }
+  if(!L.legR){ R(33,44,7,14,o.legs); R(37,44,3,14,o.legsD); R(33,56,11,5,o.boots); }
+  else { R(33,44,7,4,o.legs); R(33,48,7,2,BLD); R(35,51,2,2,BLD2); }
+  R(22,26,20,19,o.torso); R(22,26,3,19,o.torsoD); R(39,26,3,19,o.torsoD);
+  R(22,41,20,4,o.belt);
+  R(30,24,6,3,o.skinD);
+  R(27,12,12,13,o.skin); R(27,12,2,13,o.skinD);
+  R(35,17,2,2,'#1a0f08');
+  if(!L.armR){ R(40,28,6,15,o.skin); R(43,28,2,15,o.skinD); }
+  else { R(40,28,5,3,o.skin); R(40,31,5,2,BLD); R(41,34,2,2,BLD2); }
+}
+/* Ferimentos visíveis: manchas de sangue que crescem conforme a vida cai (w = 0, 1 ou 2) */
+function woundMarks(R,w){
+  if(w<1) return;
+  R(27,32,3,2,BLD); R(34,36,2,4,BLD); R(30,38,2,2,BLD2);
+  if(w>=2){ R(25,28,4,6,BLD); R(36,30,3,3,BLD); R(29,14,2,5,BLD); R(33,40,3,3,BLD2); R(38,17,1,6,BLD2); }
+}
+
+/* =====================================================================
+   PERSONAGENS. Cada função desenha o sprite respeitando os membros perdidos (L).
+   ===================================================================== */
+const DRAW = {};
+/* Gladiador do jogador (personalizável): elmo, escudo e gládio */
+const LOOK_KEY = 'gladiators_arena_look_v1';
+const DEF_LOOK = { skin:'#d9a066', hair:'#2c1e13', armor:'#b8802f', cloth:'#8B1A1A', metal:'#c9c9c9', boots:'#6b4423', helmet:true, long:false };
+const SWATCH = {
+  skin:  ['#f3d2b3','#e0b08a','#d9a066','#b87c46','#8d5a32','#5e3a22'],
+  hair:  ['#2c1e13','#5a3a1c','#a0522d','#d9b36a','#e8e0d0','#8B1A1A','#3a6ea5'],
+  armor: ['#b8802f','#7a7a7a','#8B1A1A','#4a6b3a','#3b5b8c','#3a3a3a','#D4A574'],
+  cloth: ['#8B1A1A','#2b4a8c','#2f6b3a','#c9a227','#E8DCC6','#2C1E13','#a0522d'],
+  metal: ['#c9c9c9','#e0b43a','#b8802f','#5C5C5C','#9aa7b5'],
+  boots: ['#6b4423','#2C1E13','#8B5A2B','#4a4a4a','#7a2a1a']
+};
+const LOOK_CATS = ['skin','hair','armor','cloth','metal','boots'];
+let LOOK = Object.assign({}, DEF_LOOK);
+function loadLook(){ try{ const j = JSON.parse(localStorage.getItem(LOOK_KEY)); if(j) LOOK = Object.assign({}, DEF_LOOK, j); }catch(e){} }
+function saveLook(){ try{ localStorage.setItem(LOOK_KEY, JSON.stringify(LOOK)); }catch(e){} }
+
+DRAW.player = (R,L,P) => {
+  const sk=P.skin, skD=shade(sk,-.2), ar=P.armor, arD=shade(ar,-.3), arL=shade(ar,.25);
+  const cl=P.cloth, clD=shade(cl,-.3), clL=shade(cl,.2), mt=P.metal, mtL=shade(mt,.4), mtD=shade(mt,-.3);
+  const hr=P.hair, hrD=shade(hr,-.3), hrL=shade(hr,.3), bt=P.boots;
+  if(!L.armL){ R(11,30,15,14,cl); R(9,32,19,10,cl); R(13,34,11,6,clD); R(16,35,5,4,mt); R(9,32,1,10,mtD); R(11,30,15,1,mtL); }   // escudo
+  humanoid(R,{L,skin:sk,skinD:skD,torso:ar,torsoD:arD,belt:cl,legs:sk,legsD:skD,boots:bt});
+  if(!L.legL){ R(24,48,7,8,mt); R(24,48,2,8,mtL); }                      // caneleiras
+  if(!L.legR){ R(33,48,7,8,mt); R(37,48,3,8,mtD); }
+  R(27,30,10,2,arL); R(27,34,10,2,arL); R(22,44,20,4,cl); R(22,47,20,1,clD);
+  if(P.helmet){
+    if(P.long){ R(24,14,4,22,hr); R(24,14,1,22,hrD); } else { R(25,17,3,8,hr); }
+    R(26,9,14,8,ar); R(26,9,14,2,arL); R(26,15,3,9,ar);
+    R(30,3,8,6,cl); R(34,1,6,4,clL);
+  } else {
+    R(26,9,14,7,hr); R(26,9,14,1,hrL); R(26,9,3,16,hr); R(36,12,3,2,hrD);
+    if(P.long){ R(23,9,6,28,hr); R(23,9,1,28,hrD); }
+  }
+  if(!L.armR){ R(46,6,3,32,mtL); R(46,6,1,32,'#ffffff'); R(47,3,1,3,mtL); R(43,37,9,2,mt); R(46,39,3,6,bt); R(43,39,5,5,sk); }   // gládio
+};
+/* Thrax: machado enferrujado, armadura de couro */
+DRAW.thrax = (R,L) => {
+  humanoid(R,{L,skin:'#c28a5a',skinD:'#9c6a40',torso:'#6b4a2a',torsoD:'#4a3219',belt:'#2c1e13',legs:'#5a4128',legsD:'#3d2b18',boots:'#2c1e13'});
+  R(28,13,6,2,'#d9a878'); R(27,16,12,2,'#7a3b1c'); R(28,21,10,5,'#2c1e13'); R(36,22,2,3,'#2c1e13');
+  R(24,28,4,4,'#3a2616'); R(27,31,4,4,'#3a2616'); R(30,34,4,4,'#3a2616'); R(33,37,4,4,'#3a2616');
+  if(!L.armR){
+    R(38,25,8,5,'#4a3219'); R(38,25,8,1,'#6b4a2a');
+    R(47,12,3,46,'#6b4423'); R(47,12,1,46,'#8a5b2f');
+    R(49,6,11,14,'#7a7a7a'); R(49,6,11,2,'#9a9a9a'); R(57,6,3,14,'#b0b0b0');
+    R(51,10,3,3,'#a0522d'); R(54,15,4,3,'#a0522d'); R(50,17,2,2,'#7a3b1c');
+    R(44,36,6,6,'#c28a5a');
+  }
+};
+/* Lysandra: duas adagas, armadura leve, véu */
+DRAW.lysandra = (R,L) => {
+  R(14,10,9,24,'#2c1e13'); R(14,10,2,24,'#4a1a1a');
+  humanoid(R,{L,skin:'#e0b08a',skinD:'#bf8c64',torso:'#4a2d2d',torsoD:'#331c1c',belt:'#8B1A1A',legs:'#3a2a2a',legsD:'#271b1b',boots:'#241615'});
+  R(26,10,14,6,'#2c1e13'); R(26,10,3,16,'#2c1e13');
+  R(29,21,10,5,'#8B1A1A'); R(29,21,10,1,'#b52a2a');
+  R(22,26,20,2,'#8B1A1A'); R(30,30,4,10,'#8B1A1A'); R(22,44,20,4,'#6b1c1c');
+  if(!L.armR){ R(44,34,4,5,'#e0b08a'); R(46,33,2,7,'#D4A574'); R(48,35,10,2,'#e8e8e8'); R(58,34,2,2,'#e8e8e8'); }
+  if(!L.armL){ R(16,16,2,14,'#e8e8e8'); R(14,29,6,3,'#D4A574'); R(15,31,4,5,'#bf8c64'); }
+};
+/* O Pilar: armadura pesada, martelo gigante */
+DRAW.pillar = (R,L) => {
+  if(!L.legL){ R(21,46,11,13,'#4a4a4a'); R(20,57,13,5,'#2e2e2e'); } else { R(21,46,11,4,'#4a4a4a'); R(21,50,11,2,BLD); R(23,53,2,2,BLD2); }
+  if(!L.legR){ R(33,46,11,13,'#4a4a4a'); R(33,57,14,5,'#2e2e2e'); } else { R(33,46,11,4,'#4a4a4a'); R(33,50,11,2,BLD); R(36,53,2,2,BLD2); }
+  R(16,24,32,24,'#5C5C5C'); R(16,24,32,3,'#8a8a8a'); R(16,24,4,24,'#454545'); R(44,24,4,24,'#454545');
+  R(30,28,4,16,'#444444'); R(16,44,32,4,'#3a3a3a');
+  if(!L.armL){ R(10,20,12,11,'#6e6e6e'); R(10,20,12,2,'#9a9a9a'); } else { R(14,22,8,4,'#6e6e6e'); R(14,26,8,2,BLD); R(16,29,2,2,BLD2); }
+  R(42,20,12,11,'#6e6e6e'); R(42,20,12,2,'#9a9a9a');
+  [[20,30],[20,38],[42,30],[42,38],[12,26],[50,26]].forEach(p => R(p[0],p[1],2,2,'#d0d0d0'));
+  R(24,4,16,18,'#707070'); R(24,4,16,3,'#9a9a9a'); R(24,4,3,18,'#555555');
+  R(30,12,10,3,'#0f0f0f'); R(33,17,2,4,'#333333'); R(36,17,2,4,'#333333'); R(31,1,4,3,'#8B1A1A');
+  if(!L.armR){
+    R(52,12,4,48,'#5a3a1c'); R(52,12,1,48,'#7a5530');
+    R(44,2,19,13,'#707070'); R(44,2,19,3,'#a0a0a0'); R(44,12,19,3,'#454545'); R(48,5,2,2,'#d0d0d0'); R(57,5,2,2,'#d0d0d0');
+    R(44,30,9,14,'#5C5C5C'); R(44,30,9,2,'#8a8a8a');
+  } else { R(44,28,6,4,'#6e6e6e'); R(44,32,6,2,BLD); R(45,35,2,2,BLD2); }
+};
+/* Imperador Antares: espada dourada, manto vermelho */
+DRAW.antares = (R,L) => {
+  R(13,24,13,38,'#8B1A1A'); R(13,24,3,38,'#5e1010'); R(24,24,2,38,'#a82424');
+  humanoid(R,{L,skin:'#d9a88a',skinD:'#b8866a',torso:'#D4A574',torsoD:'#a87b3c',belt:'#8B1A1A',legs:'#8B1A1A',legsD:'#5e1010',boots:'#a87b3c'});
+  R(22,26,20,3,'#f0c850'); R(30,30,4,4,'#c0392b'); R(29,29,6,1,'#f0c850'); R(29,34,6,1,'#f0c850');
+  R(38,24,9,6,'#f0c850'); R(38,24,9,1,'#fff3b0');
+  R(26,10,13,4,'#e8e0d0'); R(26,10,3,14,'#e8e0d0'); R(29,21,9,5,'#e8e0d0');
+  R(26,8,13,4,'#f0c850'); R(27,4,2,5,'#f0c850'); R(31,2,2,7,'#f0c850'); R(35,4,2,5,'#f0c850');
+  if(!L.armR){
+    R(47,2,4,36,'#f0c850'); R(47,2,1,36,'#fff3b0'); R(50,2,1,36,'#b8892a'); R(48,0,2,2,'#f0c850');
+    R(43,37,12,3,'#8B1A1A'); R(43,37,12,1,'#D4A574'); R(47,40,4,7,'#5a3a1c'); R(47,46,4,2,'#f0c850'); R(44,40,6,5,'#d9a88a');
+  }
+};
+
+/* Gera (e guarda em cache) o sprite de um lutador para um estado de membros perdidos e de ferimentos */
+const SPR_CACHE = {};
+function spriteUrl(id, L, w, look){
+  L = L || NOLOST; w = w || 0; look = look || LOOK;
+  const key = id + (id==='player' ? JSON.stringify(look) : '') + (L.armR?1:0) + (L.armL?1:0) + (L.legR?1:0) + (L.legL?1:0) + w;
+  if(SPR_CACHE[key]) return SPR_CACHE[key];
+  return SPR_CACHE[key] = sprite(R => { DRAW[id](R,L,look); woundMarks(R,w); });
+}
+const playerUrl = () => spriteUrl('player', NOLOST, 0, LOOK);
+
+/* =====================================================================
+   NOVOS CAMPEÕES (também respeitam membros perdidos)
+   ===================================================================== */
+/* Sir Aldric, o Cavaleiro Negro: armadura de ébano, escudo e espada longa */
+DRAW.aldric = (R,L) => {
+  if(!L.armL){ R(8,28,16,22,'#3a3a46'); R(8,28,16,2,'#8a8a9a'); R(10,32,12,14,'#2a2a34'); R(14,36,4,6,'#8B1A1A'); R(8,28,2,22,'#5a5a6a'); }
+  humanoid(R,{L,skin:'#3c3c48',skinD:'#2a2a34',torso:'#2e2e36',torsoD:'#1f1f27',belt:'#8B1A1A',legs:'#2e2e36',legsD:'#1f1f27',boots:'#1a1a20'});
+  R(26,9,14,16,'#3c3c48'); R(26,9,14,2,'#8a8a9a'); R(31,15,9,2,'#0a0a0a'); R(26,9,3,16,'#2a2a34');
+  R(30,2,8,7,'#8B1A1A'); R(34,0,5,4,'#a82424');
+  R(27,30,10,2,'#8a8a9a'); R(27,34,10,2,'#8a8a9a');
+  if(!L.armR){
+    R(38,25,9,6,'#5a5a6a'); R(38,25,9,1,'#8a8a9a');
+    R(47,4,3,36,'#d0d0dc'); R(47,4,1,36,'#ffffff'); R(43,38,11,2,'#8B1A1A'); R(47,40,3,6,'#2c1e13'); R(44,38,5,5,'#3c3c48');
+  }
+};
+/* Zahra, a Feiticeira: manto verde-escuro, cajado com orbe de fogo */
+DRAW.zahra = (R,L) => {
+  R(14,10,10,28,'#e8e0d0'); R(14,10,2,28,'#c9c0ae');
+  humanoid(R,{L,skin:'#e8c9ae',skinD:'#c4a287',torso:'#1f4d4a',torsoD:'#173936',belt:'#c9a227',legs:'#1f4d4a',legsD:'#173936',boots:'#2c1e13'});
+  R(25,8,16,9,'#1f4d4a'); R(25,8,3,18,'#1f4d4a'); R(25,8,16,2,'#2f7a74');
+  R(22,26,20,2,'#c9a227'); R(30,28,4,12,'#c9a227'); R(22,44,20,3,'#173936');
+  if(!L.armR){
+    R(47,8,3,50,'#5a3a1c'); R(47,8,1,50,'#7a5530');
+    R(44,2,9,9,'#ff8c2a'); R(46,0,5,13,'#ffd24a'); R(46,4,5,5,'#fff1a8'); R(44,36,6,6,'#e8c9ae');
+  }
+};
+/* Gorm, o Gigante: peito nu, capacete com chifres e machado enorme */
+DRAW.gorm = (R,L) => {
+  if(!L.legL){ R(21,46,11,13,'#5a3a22'); R(20,57,13,5,'#2c1e13'); } else { R(21,46,11,4,'#5a3a22'); R(21,50,11,2,BLD); R(23,53,2,2,BLD2); }
+  if(!L.legR){ R(33,46,11,13,'#5a3a22'); R(33,57,14,5,'#2c1e13'); } else { R(33,46,11,4,'#5a3a22'); R(33,50,11,2,BLD); R(36,53,2,2,BLD2); }
+  R(16,24,32,24,'#c88a5e'); R(16,24,4,24,'#a86e46'); R(44,24,4,24,'#a86e46'); R(24,28,16,3,'#a86e46'); R(26,35,12,2,'#a86e46');
+  R(16,44,32,4,'#5a3a22'); R(28,44,8,4,'#d4a574');
+  if(!L.armL){ R(10,20,12,11,'#6b4a2a'); R(10,20,12,3,'#8a6a42'); } else { R(14,22,8,4,'#c88a5e'); R(14,26,8,2,BLD); R(16,29,2,2,BLD2); }
+  R(42,20,12,11,'#6b4a2a'); R(42,20,12,3,'#8a6a42');
+  R(24,6,16,16,'#c88a5e'); R(24,4,16,6,'#7a7a7a'); R(22,0,4,10,'#e8e0d0'); R(38,0,4,10,'#e8e0d0'); R(24,16,16,8,'#b3421e'); R(34,13,3,2,'#1a0f08');
+  if(!L.armR){
+    R(52,10,4,50,'#5a3a1c'); R(44,4,15,20,'#8a8a8a'); R(44,4,15,3,'#c9c9c9'); R(55,8,4,12,'#c9c9c9'); R(46,10,3,3,'#6a6a6a');
+    R(44,30,9,14,'#c88a5e'); R(44,30,9,2,'#a86e46');
+  } else { R(44,28,6,4,'#c88a5e'); R(44,32,6,2,BLD); R(45,35,2,2,BLD2); }
+};
+/* Nyx, a Sombra: capuz, máscara escarlate, lâmina curva e adaga */
+DRAW.nyx = (R,L) => {
+  R(14,22,12,36,'#1e2a24'); R(14,22,3,36,'#121a16');
+  humanoid(R,{L,skin:'#b89a7c',skinD:'#917659',torso:'#23302a',torsoD:'#161f1b',belt:'#8B1A1A',legs:'#1c2622',legsD:'#121a16',boots:'#0f1512'});
+  R(25,8,16,10,'#23302a'); R(25,8,3,18,'#23302a'); R(25,8,16,2,'#34493f');
+  R(29,19,10,6,'#8B1A1A'); R(34,15,3,2,'#ffd24a'); R(22,26,20,2,'#34493f');
+  if(!L.armR){
+    R(45,28,5,5,'#b89a7c'); R(46,30,3,5,'#2c1e13'); R(48,24,2,8,'#d0d0dc'); R(50,18,2,8,'#d0d0dc'); R(52,12,2,8,'#e8e8f0'); R(53,8,2,5,'#ffffff');
+  }
+  if(!L.armL){ R(12,30,9,2,'#d0d0dc'); R(10,29,3,4,'#8B1A1A'); R(17,32,5,4,'#917659'); }
+};
+
+/* =====================================================================
+   AUDIO: tudo sintetizado com Web Audio (sem arquivos externos)
+   - Música do menu: alaúde + bordão + tambor em ré dórico, em loop.
+   - Efeitos: ataques, magia, fogo, pilar, plateia, cicatrizes etc.
+   O navegador só libera o som após o primeiro toque/clique.
+   ===================================================================== */
+const MUTE_KEY = 'gladiators_arena_muted';
+const AUD = { ctx:null, master:null, mus:null, fx:null, nb:null, muted:false, want:true, ready:false,
+              timer:null, stopT:null, step:0, next:0 };
+try{ AUD.muted = localStorage.getItem(MUTE_KEY)==='1'; }catch(e){}
+
+function audioInit(){
+  if(AUD.ctx) return;
+  const AC = window.AudioContext || window.webkitAudioContext; if(!AC) return;
+  const c = AUD.ctx = new AC();
+  AUD.master = c.createGain(); AUD.master.gain.value = AUD.muted ? 0 : .75;
+  const comp = c.createDynamicsCompressor(); AUD.master.connect(comp); comp.connect(c.destination);
+  AUD.mus = c.createGain(); AUD.mus.gain.value = 0; AUD.mus.connect(AUD.master);
+  AUD.fx  = c.createGain(); AUD.fx.gain.value = .9; AUD.fx.connect(AUD.master);
+  const len = c.sampleRate*2, b = c.createBuffer(1,len,c.sampleRate), d = b.getChannelData(0);
+  for(let i=0;i<len;i++) d[i] = Math.random()*2-1;
+  AUD.nb = b;
+}
+function audioUnlock(){
+  audioInit(); if(!AUD.ctx) return;
+  if(AUD.ctx.state==='suspended') AUD.ctx.resume();
+  AUD.ready = true;
+  const h = $('soundHint'); if(h) h.style.display = 'none';
+  musicSync();
+}
+function toggleMute(){
+  audioUnlock();
+  AUD.muted = !AUD.muted;
+  try{ localStorage.setItem(MUTE_KEY, AUD.muted?'1':'0'); }catch(e){}
+  if(AUD.master) AUD.master.gain.setTargetAtTime(AUD.muted?0:.75, AUD.ctx.currentTime, .05);
+  renderMute();
+}
+function renderMute(){
+  const b = $('muteBtn'); b.textContent = AUD.muted ? t('soundOff') : t('soundOn');
+  b.classList.toggle('off', AUD.muted);
+}
+const sndOk = () => AUD.ctx && AUD.ready && !AUD.muted;
+
+/* --- blocos básicos: tom e ruído --- */
+function tone(f,d,type,vol,slide,delay,dest){
+  const c=AUD.ctx, t=c.currentTime+(delay||0);
+  const o=c.createOscillator(), g=c.createGain();
+  o.type=type||'sine'; o.frequency.setValueAtTime(f,t);
+  if(slide) o.frequency.exponentialRampToValueAtTime(slide,t+d);
+  g.gain.setValueAtTime(vol,t); g.gain.exponentialRampToValueAtTime(.0001,t+d);
+  o.connect(g); g.connect(dest||AUD.fx); o.start(t); o.stop(t+d+.05);
+}
+function noise(d,type,f1,f2,vol,delay,q,dest){
+  const c=AUD.ctx, t=c.currentTime+(delay||0);
+  const s=c.createBufferSource(), fl=c.createBiquadFilter(), g=c.createGain();
+  s.buffer=AUD.nb; fl.type=type; fl.Q.value=q||1; fl.frequency.setValueAtTime(f1,t);
+  if(f2!==f1) fl.frequency.exponentialRampToValueAtTime(f2,t+d);
+  g.gain.setValueAtTime(vol,t); g.gain.exponentialRampToValueAtTime(.0001,t+d);
+  s.connect(fl); fl.connect(g); g.connect(dest||AUD.fx); s.start(t,Math.random()); s.stop(t+d+.05);
+}
+
+/* --- efeitos sonoros --- */
+const SFX = {
+  ui(){    tone(520,.07,'square',.1,780); },
+  step(){  noise(.13,'bandpass',900,500,.28,0,1); },
+  swing(){ noise(.18,'bandpass',500,2200,.3,0,.8); },
+  hit(){   tone(150,.18,'sine',.6,45); noise(.12,'lowpass',2500,300,.5); },
+  crit(){  SFX.hit(); tone(1320,.4,'triangle',.22,1800,.02); tone(1980,.3,'sine',.1,2400,.05); },
+  miss(){  noise(.22,'bandpass',1800,700,.18); },
+  defend(){tone(900,.25,'square',.1,500); tone(1350,.3,'triangle',.16,900,.01); noise(.08,'highpass',3000,3000,.2); },
+  rest(){  tone(330,.5,'sine',.18,440); tone(440,.5,'sine',.14,550,.12); },
+  magic(){ noise(.75,'bandpass',300,2600,.45,0,.9); tone(120,.7,'sawtooth',.16,360); noise(.4,'highpass',4000,6000,.15,.25); },
+  taunt(){ noise(1,'bandpass',700,1100,.28,0,.7); tone(196,.6,'sawtooth',.1,262,.05); },
+  boo(){   tone(180,.7,'sawtooth',.1,110); noise(.7,'lowpass',500,300,.28); },
+  heal(){  [523,659,784,1047].forEach((f,i)=>tone(f,.28,'triangle',.16,0,i*.07)); },
+  stone(){ tone(110,.22,'sine',.6,50); noise(.15,'lowpass',1800,200,.5); noise(.5,'bandpass',600,400,.12,.1,.6); },
+  crack(){ noise(.1,'highpass',2500,2500,.4); tone(260,.1,'square',.18,90); },
+  dismember(){ noise(.4,'lowpass',2200,200,.6); tone(90,.4,'sawtooth',.28,40); tone(1500,.1,'square',.1,300); },
+  sizzle(){noise(.5,'highpass',4000,6000,.28); },
+  fireAdv(){noise(1,'lowpass',300,120,.6); noise(.8,'highpass',3500,5000,.16,.1); tone(60,1,'sawtooth',.22,35); },
+  pillar(){tone(70,.8,'sine',.9,25); noise(.55,'lowpass',900,80,.7); },
+  thud(){  tone(100,.2,'sine',.5,50); },
+  gong(){  tone(98,1.8,'sine',.5); tone(196,1.5,'sine',.22); tone(293,1.2,'sine',.1); tone(147,.7,'sawtooth',.12,150); },
+  victory(){[392,523,659,784,1047].forEach((f,i)=>tone(f,.4,'triangle',.2,0,i*.1)); tone(523,1,'sine',.15,0,.55); tone(784,1,'sine',.12,0,.55); },
+  death(){ [392,330,262,196].forEach((f,i)=>tone(f,.7,'sawtooth',.12,f*.9,i*.35)); noise(1.2,'lowpass',600,100,.25,.2); },
+  gameover(){
+    [[330,.5,0],[311,.5,.5],[294,.5,1],[262,1.7,1.5]].forEach(n=>{ tone(n[0],n[1],'sawtooth',.13,n[0]*.96,n[2]); tone(n[0]/2,n[1],'triangle',.2,n[0]*.48,n[2]); });
+    tone(65,2.6,'sine',.5,38,1.5); noise(1.6,'lowpass',500,80,.35,1.5);
+  },
+  bless(){ [659,880,1175].forEach((f,i)=>tone(f,.45,'sine',.15,0,i*.09)); },
+  win(){   [392,523,659,784,1047,784,1047,1319].forEach((f,i)=>tone(f,.5,'triangle',.2,0,i*.13)); tone(523,1.6,'sine',.16,0,1.1); tone(784,1.6,'sine',.14,0,1.1); tone(1047,1.6,'sine',.12,0,1.1); }
+};
+function sfx(n){ try{ if(sndOk() && SFX[n]) SFX[n](); }catch(e){} }
+
+/* --- música do menu --- */
+const STEP_T = 60/84/2;                       // colcheia a 84 bpm
+const MEL  = [62,0,65,0,69,0,67,65, 64,0,62,0,65,0,64,62, 62,0,65,0,69,0,72,70, 69,67,65,64,62,0,0,0];
+const BASS = [50,48,46,45];
+function pluck(t,midi,vol,dur){
+  const c=AUD.ctx, f=440*Math.pow(2,(midi-69)/12);
+  const o=c.createOscillator(), g=c.createGain(), lp=c.createBiquadFilter();
+  o.type='sawtooth'; o.frequency.value=f;
+  lp.type='lowpass'; lp.frequency.setValueAtTime(2400,t); lp.frequency.exponentialRampToValueAtTime(500,t+dur);
+  g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(vol,t+.008); g.gain.exponentialRampToValueAtTime(.0001,t+dur);
+  o.connect(lp); lp.connect(g); g.connect(AUD.mus); o.start(t); o.stop(t+dur+.05);
+}
+function pad(t,dur){
+  [38,45].forEach(m=>{
+    const c=AUD.ctx, o=c.createOscillator(), g=c.createGain(), lp=c.createBiquadFilter();
+    o.type='sawtooth'; o.frequency.value=440*Math.pow(2,(m-69)/12);
+    lp.type='lowpass'; lp.frequency.value=320;
+    g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(.06,t+1); g.gain.setValueAtTime(.06,t+dur-1); g.gain.linearRampToValueAtTime(0,t+dur);
+    o.connect(lp); lp.connect(g); g.connect(AUD.mus); o.start(t); o.stop(t+dur+.05);
+  });
+}
+function musicStep(s,t){
+  const m = MEL[s]; if(m) pluck(t,m,.22,.9);
+  if(s%8===0){
+    const b = BASS[s/8];
+    pluck(t,b,.3,1.6); pluck(t,b+12,.12,1.2);
+    const c=AUD.ctx, o=c.createOscillator(), g=c.createGain();               // tambor grave
+    o.frequency.setValueAtTime(130,t); o.frequency.exponentialRampToValueAtTime(55,t+.22);
+    g.gain.setValueAtTime(.55,t); g.gain.exponentialRampToValueAtTime(.0001,t+.3);
+    o.connect(g); g.connect(AUD.mus); o.start(t); o.stop(t+.35);
+  }
+  if(s%8===4){
+    const c=AUD.ctx, o=c.createOscillator(), g=c.createGain();
+    o.frequency.setValueAtTime(110,t); o.frequency.exponentialRampToValueAtTime(60,t+.15);
+    g.gain.setValueAtTime(.3,t); g.gain.exponentialRampToValueAtTime(.0001,t+.2);
+    o.connect(g); g.connect(AUD.mus); o.start(t); o.stop(t+.25);
+  }
+  if(s%8===6) noise(.05,'highpass',5000,5000,.06,t-AUD.ctx.currentTime,1,AUD.mus);
+  if(s%16===0) pad(t,5.6);
+}
+function musicTick(){
+  const c = AUD.ctx;
+  while(AUD.next < c.currentTime + .35){
+    musicStep(AUD.step, AUD.next);
+    AUD.next += STEP_T; AUD.step = (AUD.step+1) % 32;
+  }
+}
+function musicStart(){
+  const c = AUD.ctx;
+  clearTimeout(AUD.stopT); AUD.stopT = null;
+  AUD.mus.gain.cancelScheduledValues(c.currentTime);
+  AUD.mus.gain.setTargetAtTime(.45, c.currentTime, .4);
+  if(AUD.timer) return;
+  AUD.step = 0; AUD.next = c.currentTime + .15;
+  AUD.timer = setInterval(musicTick, 90);
+}
+function musicStop(){
+  if(!AUD.timer || AUD.stopT) return;
+  AUD.mus.gain.setTargetAtTime(0, AUD.ctx.currentTime, .25);
+  AUD.stopT = setTimeout(()=>{ clearInterval(AUD.timer); AUD.timer=null; AUD.stopT=null; }, 1200);
+}
+function musicSync(){ if(!AUD.ready) return; AUD.want ? musicStart() : musicStop(); }
+
+/* libera o áudio no primeiro toque e dá clique sonoro nos botões */
+document.addEventListener('pointerdown', e => {
+  audioUnlock();
+  const b = e.target.closest && e.target.closest('.btn, .step button, .muteBtn, .flag, .homeBtn, .tgl, .swb');
+  if(b && !b.disabled && !b.classList.contains('muteBtn')) sfx('ui');
+}, true);
+document.addEventListener('keydown', audioUnlock, true);
+document.addEventListener('visibilitychange', () => {
+  if(!AUD.ctx) return;
+  document.hidden ? AUD.ctx.suspend() : (AUD.ready && AUD.ctx.resume());
+});
+
+/* --- sons extras: clima, plateia, impacto --- */
+Object.assign(SFX, {
+  thunder(){ noise(1.8,'lowpass',420,60,.9); tone(50,1.5,'sine',.5,30,.1); noise(.5,'highpass',2000,2000,.35); },
+  splash(){  noise(.28,'bandpass',700,280,.45,0,.6); tone(220,.12,'sine',.18,120); },
+  cheer(){   noise(1.2,'bandpass',900,1500,.35,0,.8); noise(1.2,'bandpass',1900,1200,.2,.05,.8); },
+  gasp(){    noise(.5,'bandpass',1500,700,.3,0,1.2); },
+  throwSfx(){noise(.3,'bandpass',900,2200,.2); },
+  verdict(){ for(let i=0;i<9;i++) tone(110,.14,'sine',.3,70,i*.09); tone(80,1,'sine',.5,40,.85); noise(.9,'highpass',3000,5000,.2,.85); },
+  heavy(){   tone(90,.28,'sine',.7,40); noise(.35,'lowpass',1800,150,.7); },
+  blood(){   noise(.3,'lowpass',1200,200,.5); tone(300,.2,'sawtooth',.1,120); }
+});
+/* ambiente em loop: murmúrio da plateia, chuva e vento */
+const AMB = { nodes:{}, n:0 };
+function ambNode(name){
+  if(AMB.nodes[name]) return AMB.nodes[name];
+  const c = AUD.ctx, s = c.createBufferSource(), f = c.createBiquadFilter(), g = c.createGain();
+  s.buffer = AUD.nb; s.loop = true;
+  if(name==='crowd'){ f.type='bandpass'; f.frequency.value=650; f.Q.value=.7; }
+  if(name==='rain'){  f.type='highpass'; f.frequency.value=2800; f.Q.value=.4; }
+  if(name==='wind'){  f.type='bandpass'; f.frequency.value=500; f.Q.value=.9; }
+  g.gain.value = 0; s.connect(f); f.connect(g); g.connect(AUD.fx); s.start();
+  return AMB.nodes[name] = { s, f, g };
+}
+function ambSet(name,lv){
+  if(!AUD.ctx || !AUD.ready) return;
+  if(lv<=0 && !AMB.nodes[name]) return;
+  const n = ambNode(name);
+  n.g.gain.setTargetAtTime(AUD.muted ? 0 : lv, AUD.ctx.currentTime, .3);
+  if(name==='wind' && lv>0 && Math.random()<.06) n.f.frequency.setTargetAtTime(350+Math.random()*550, AUD.ctx.currentTime, .7);
+}
+function ambTick(){
+  const on = S.screen==='sBattle' && S.active;
+  ambSet('crowd', on ? .03 + S.excite*.09 : 0);
+  ambSet('rain',  on && S.weather==='rain' ? .07 : 0);
+  ambSet('wind',  on && S.weather==='sand' ? .09 : 0);
+}
+/* =====================================================================
+   2. TRADUÇÕES (pt / en / es). Use t('chave', {param:valor})
+   ===================================================================== */
+const I18N = {
+pt:{
+ enter:'ENTRAR NA ARENA →', soundHint:'♪ Toque em qualquer lugar para ativar o som', soundOn:'SOM ON', soundOff:'SOM OFF', home:'INÍCIO',
+ lineage:'Geração {g} · Cicatrizes herdadas: {n}/{m}', linWins:' · Vitórias da linhagem: {w}', linReset:'zerar linhagem',
+ confirmReset:'Apagar toda a linhagem e as cicatrizes herdadas?', confirmLeave:'Voltar ao início? A luta atual será perdida.',
+ createTitle:'FORJE SEU GLADIADOR', namePh:'Nome do gladiador', defName:'Gladiador', ptsLeft:'Pontos restantes:',
+ balanced:'EQUILIBRADO', resetPts:'ZERAR', looks:'APARÊNCIA',
+ c_skin:'Pele', c_hair:'Cabelo', c_armor:'Armadura', c_cloth:'Tecido', c_metal:'Metal', c_boots:'Botas',
+ optHelmet:'Elmo', optLong:'Cabelo longo', yes:'SIM', no:'NÃO', randomLook:'SORTEAR', defaultLook:'PADRÃO',
+ scarsTitle:'CICATRIZES HERDADAS', noScars:'Nenhuma ainda. Você inaugura a linhagem (Geração {g}).', scarCount:'{n}/{m} · Geração {g}',
+ needPoints:'Distribua todos os pontos antes de lutar.', fight:'LUTAR →', back:'← VOLTAR',
+ pvHp:'HP', pvSta:'STA', pvCrowd:'Plateia', pvFire:'Resist. fogo',
+ attr_pow:'PODER', attr_agi:'AGILIDADE', attr_vit:'VITALIDADE', attr_cha:'CARISMA', attr_end:'RESISTÊNCIA',
+ attrd_pow:'Dano de ataque e magia', attrd_agi:'Acerto, crítico e alcance de movimento', attrd_vit:'Pontos de vida',
+ attrd_cha:'Favor inicial e economia da plateia', attrd_end:'Stamina máxima e descanso',
+ ab_pow:'POD', ab_agi:'AGI', ab_vit:'VIT', ab_cha:'CAR', ab_end:'RES',
+ heroYou:'VOCÊ', hero_thrax:'THRAX', hero_lysandra:'LYSANDRA', hero_pillar:'O PILAR', hero_antares:'ANTARES',
+ name_thrax:'Thrax o Cruel', name_lysandra:'Lysandra Véu de Sangue', name_pillar:'O Pilar', name_antares:'Imperador Antares',
+ title_thrax:'O Açougueiro de Tebas', title_lysandra:'A Dançarina das Adagas', title_pillar:'Muralha de Ferro', title_antares:'Senhor da Arena',
+ scar_fire:'Cicatriz Queimada', scard_fire:'Resistência a fogo +20%, Power +1, HP -5',
+ scar_blade:'Cicatriz de Lâmina', scard_blade:'HP +5, Power +1, Agility -1',
+ scar_stone:'Cicatriz da Multidão', scard_stone:'Charisma +3',
+ death_fire:'Você foi consumido pelas chamas da arena.', death_blade:'Você tombou em combate, sob o aço do adversário.', death_stone:'A plateia o apedrejou até a morte.',
+ life:'VIDA', sta:'STAMINA', crowd:'PLATEIA', limbs:'MEMBROS', guard:'GUARDA', genLine:'Geração {g} · Resist. fogo {r}%', level:'Nível {n}',
+ limbOk:'OK', limbLostTxt:'PERDIDO', none:'Nenhuma',
+ limb_armR:'Braço D', limb_armL:'Braço E', limb_legR:'Perna D', limb_legL:'Perna E',
+ topFight:'COMBATE {n}/{m}', topTurn:'TURNO {n}', fireIn:'fogo em {n}', fireMax:'fogo no limite', pillarIn:'pilar em {n}',
+ tod_day:'DIA', tod_dusk:'ENTARDECER', tod_night:'NOITE', tod_dawn:'AMANHECER',
+ todLog_day:'Dia: o sol castiga a areia da arena.', todLog_dusk:'Entardecer: o céu sangra sobre a arena.',
+ todLog_night:'Noite: tochas iluminam o combate.', todLog_dawn:'Amanhecer: a luz dourada anuncia o último duelo.',
+ act_mv:'MOVER', act_at:'ATACAR', act_df:'DEFENDER', act_rs:'DESCANSAR', act_mg:'MAGIA FOGO', act_tn:'PROVOCAR', costSta:'{n} STA', restInfo:'+STA +3 HP',
+ logFight:'== COMBATE {n}/{m}: {name}, {title} ==', logHint:'Clique numa célula destacada para mover. ATACAR alcança 1.5 casa; MAGIA alcança 3.',
+ miss:'ERROU', guarded:' (defendido)', dismemberFloat:'DESMEMBRADO!',
+ logMiss:'{a} ataca e ERRA {d}.', logHit:'{a} golpeia {d}: -{n} HP{g}.', logCrit:'{a} acerta um CRÍTICO em {d}: -{n} HP{g}.',
+ logFire:'{a} conjura MAGIA DE FOGO: -{n} HP em {d}.', logRest:'{a} descansa e recupera o fôlego.',
+ logLimbLost:'{d} perde {limb}! DESMEMBRADO!', logLimbBroke:'{limb} de {d} é destroçado!', logLimbHurt:'{limb} de {d} é ferido ({hp}/{max}).',
+ logBurn:'{f} queima nas telhas em chamas: -{n} HP.', logFireAdv:'O FOGO avança: a coluna {c} está em chamas!', logFireMax:'As chamas já cobrem metade da arena.',
+ logPillar:'Um PILAR desaba na arena (coluna {c}, fileira {r})!', logPush:'{f} é empurrado pelo pilar.', logCrush:'{f} é esmagado pelo pilar: -{n} HP.',
+ logStone:'A plateia ({fav}%) arremessa uma pedra em {t}!', logMove:'{p} move para ({c},{r}).', logAdvance:'{e} avança para ({c},{r}).',
+ logGuardE:'{e} ergue a guarda.', logDagger:'{e} golpeia de novo com a segunda adaga!', logDefend:'{p} ergue o escudo: dano corpo a corpo reduzido em 50%.',
+ logTaunt:'{p} PROVOCA a plateia! Favor +{g}.', logBread:'A plateia arremessa pão e poção! +{h} HP.', logBoo:'A plateia apenas vaia... nada de presentes.',
+ msgMoveHint:'Escolha uma célula destacada para mover.', msgFarEnemy:'O inimigo está longe demais para atacar.', msgPillar:'Um pilar bloqueia o caminho.',
+ msgOutRange:'Fora do alcance de movimento.', msgNoLegs:'Sem pernas, você não consegue se mover!', msgNoSta:'Stamina insuficiente para mover.',
+ msgTargetFar:'Alvo fora de alcance. Aproxime-se (MOVER).', msgMagicFar:'Alvo fora do alcance da magia (3 casas).',
+ logVictory:'{e} cai! A arena ruge pelo seu nome!', logDefeat:'{p} tomba na areia...',
+ blessTitle:'VITÓRIA!', blessP1:'{e} foi derrotado. Os curandeiros tratam suas feridas (+{h}% de vida, membros restaurados).',
+ blessP2:'Receba a bênção da arena e escolha um atributo:', blessNone:'SEGUIR SEM BÊNÇÃO', plusAttr:'+1 {a}',
+ deathTitle:'VOCÊ MORREU', deathBy:'Caiu diante de {e} (combate {n}/{m}).', scarMade:'CICATRIZ GERADA', scarsNext:'CICATRIZES HERDADAS PELO PRÓXIMO ({n}/{m})',
+ nextGlad:'PRÓXIMO GLADIADOR (GERAÇÃO {g}) →', toMenu:'MENU INICIAL',
+ win1:'LENDA', win2:'DA ARENA', winSub:'o imperador caiu', winP1:'{p} derrotou todos os campeões da arena, até o Imperador Antares.',
+ winP2:'Sua linhagem já tem {w} vitória(s). As cicatrizes seguem com o próximo gladiador ({n}/{m}).', newGlad:'NOVO GLADIADOR (GERAÇÃO {g}) →'
+},
+en:{
+ enter:'ENTER THE ARENA →', soundHint:'♪ Tap anywhere to enable sound', soundOn:'SOUND ON', soundOff:'SOUND OFF', home:'HOME',
+ lineage:'Generation {g} · Inherited scars: {n}/{m}', linWins:' · Lineage victories: {w}', linReset:'reset lineage',
+ confirmReset:'Erase the whole lineage and inherited scars?', confirmLeave:'Return to the start screen? The current fight will be lost.',
+ createTitle:'FORGE YOUR GLADIATOR', namePh:'Gladiator name', defName:'Gladiator', ptsLeft:'Points left:',
+ balanced:'BALANCED', resetPts:'RESET', looks:'APPEARANCE',
+ c_skin:'Skin', c_hair:'Hair', c_armor:'Armor', c_cloth:'Cloth', c_metal:'Metal', c_boots:'Boots',
+ optHelmet:'Helmet', optLong:'Long hair', yes:'YES', no:'NO', randomLook:'RANDOM', defaultLook:'DEFAULT',
+ scarsTitle:'INHERITED SCARS', noScars:'None yet. You start the lineage (Generation {g}).', scarCount:'{n}/{m} · Generation {g}',
+ needPoints:'Spend all your points before fighting.', fight:'FIGHT →', back:'← BACK',
+ pvHp:'HP', pvSta:'STA', pvCrowd:'Crowd', pvFire:'Fire resist.',
+ attr_pow:'POWER', attr_agi:'AGILITY', attr_vit:'VITALITY', attr_cha:'CHARISMA', attr_end:'ENDURANCE',
+ attrd_pow:'Attack and magic damage', attrd_agi:'Accuracy, crits and movement range', attrd_vit:'Hit points',
+ attrd_cha:'Starting favor and crowd economy', attrd_end:'Max stamina and rest',
+ ab_pow:'POW', ab_agi:'AGI', ab_vit:'VIT', ab_cha:'CHA', ab_end:'END',
+ heroYou:'YOU', hero_thrax:'THRAX', hero_lysandra:'LYSANDRA', hero_pillar:'THE PILLAR', hero_antares:'ANTARES',
+ name_thrax:'Thrax the Cruel', name_lysandra:'Lysandra Veil of Blood', name_pillar:'The Pillar', name_antares:'Emperor Antares',
+ title_thrax:'The Butcher of Thebes', title_lysandra:'The Dagger Dancer', title_pillar:'Wall of Iron', title_antares:'Lord of the Arena',
+ scar_fire:'Burned Scar', scard_fire:'Fire resistance +20%, Power +1, HP -5',
+ scar_blade:'Blade Scar', scard_blade:'HP +5, Power +1, Agility -1',
+ scar_stone:'Scar of the Crowd', scard_stone:'Charisma +3',
+ death_fire:'You were consumed by the flames of the arena.', death_blade:'You fell in combat, beneath your opponent\'s steel.', death_stone:'The crowd stoned you to death.',
+ life:'LIFE', sta:'STAMINA', crowd:'CROWD', limbs:'LIMBS', guard:'GUARD', genLine:'Generation {g} · Fire resist. {r}%', level:'Level {n}',
+ limbOk:'OK', limbLostTxt:'LOST', none:'None',
+ limb_armR:'R. Arm', limb_armL:'L. Arm', limb_legR:'R. Leg', limb_legL:'L. Leg',
+ topFight:'FIGHT {n}/{m}', topTurn:'TURN {n}', fireIn:'fire in {n}', fireMax:'fire at limit', pillarIn:'pillar in {n}',
+ tod_day:'DAY', tod_dusk:'DUSK', tod_night:'NIGHT', tod_dawn:'DAWN',
+ todLog_day:'Day: the sun scorches the arena sand.', todLog_dusk:'Dusk: the sky bleeds over the arena.',
+ todLog_night:'Night: torches light up the fight.', todLog_dawn:'Dawn: golden light announces the final duel.',
+ act_mv:'MOVE', act_at:'ATTACK', act_df:'DEFEND', act_rs:'REST', act_mg:'FIRE MAGIC', act_tn:'TAUNT', costSta:'{n} STA', restInfo:'+STA +3 HP',
+ logFight:'== FIGHT {n}/{m}: {name}, {title} ==', logHint:'Click a highlighted cell to move. ATTACK reaches 1.5 cells; MAGIC reaches 3.',
+ miss:'MISS', guarded:' (guarded)', dismemberFloat:'DISMEMBERED!',
+ logMiss:'{a} attacks and MISSES {d}.', logHit:'{a} strikes {d}: -{n} HP{g}.', logCrit:'{a} lands a CRITICAL on {d}: -{n} HP{g}.',
+ logFire:'{a} casts FIRE MAGIC: -{n} HP on {d}.', logRest:'{a} rests and catches their breath.',
+ logLimbLost:'{d} loses {limb}! DISMEMBERED!', logLimbBroke:'{d}\'s {limb} is shattered!', logLimbHurt:'{d}\'s {limb} is wounded ({hp}/{max}).',
+ logBurn:'{f} burns on the flaming tiles: -{n} HP.', logFireAdv:'FIRE advances: column {c} is ablaze!', logFireMax:'The flames already cover half the arena.',
+ logPillar:'A PILLAR crashes into the arena (column {c}, row {r})!', logPush:'{f} is pushed by the pillar.', logCrush:'{f} is crushed by the pillar: -{n} HP.',
+ logStone:'The crowd ({fav}%) hurls a stone at {t}!', logMove:'{p} moves to ({c},{r}).', logAdvance:'{e} advances to ({c},{r}).',
+ logGuardE:'{e} raises their guard.', logDagger:'{e} strikes again with the second dagger!', logDefend:'{p} raises the shield: melee damage reduced by 50%.',
+ logTaunt:'{p} TAUNTS the crowd! Favor +{g}.', logBread:'The crowd throws bread and a potion! +{h} HP.', logBoo:'The crowd just boos... no gifts.',
+ msgMoveHint:'Pick a highlighted cell to move.', msgFarEnemy:'The enemy is too far away to attack.', msgPillar:'A pillar blocks the way.',
+ msgOutRange:'Out of movement range.', msgNoLegs:'Without legs, you cannot move!', msgNoSta:'Not enough stamina to move.',
+ msgTargetFar:'Target out of range. Get closer (MOVE).', msgMagicFar:'Target out of magic range (3 cells).',
+ logVictory:'{e} falls! The arena roars your name!', logDefeat:'{p} falls on the sand...',
+ blessTitle:'VICTORY!', blessP1:'{e} has been defeated. Healers tend your wounds (+{h}% life, limbs restored).',
+ blessP2:'Receive the arena\'s blessing and choose an attribute:', blessNone:'CONTINUE WITHOUT BLESSING', plusAttr:'+1 {a}',
+ deathTitle:'YOU DIED', deathBy:'Fell before {e} (fight {n}/{m}).', scarMade:'SCAR EARNED', scarsNext:'SCARS INHERITED BY THE NEXT ONE ({n}/{m})',
+ nextGlad:'NEXT GLADIATOR (GENERATION {g}) →', toMenu:'MAIN MENU',
+ win1:'LEGEND', win2:'OF THE ARENA', winSub:'the emperor has fallen', winP1:'{p} defeated every champion of the arena, all the way up to Emperor Antares.',
+ winP2:'Your lineage now has {w} victory(ies). The scars pass on to the next gladiator ({n}/{m}).', newGlad:'NEW GLADIATOR (GENERATION {g}) →'
+},
+es:{
+ enter:'ENTRAR EN LA ARENA →', soundHint:'♪ Toca en cualquier lugar para activar el sonido', soundOn:'SONIDO ON', soundOff:'SONIDO OFF', home:'INICIO',
+ lineage:'Generación {g} · Cicatrices heredadas: {n}/{m}', linWins:' · Victorias del linaje: {w}', linReset:'reiniciar linaje',
+ confirmReset:'¿Borrar todo el linaje y las cicatrices heredadas?', confirmLeave:'¿Volver al inicio? Se perderá la pelea actual.',
+ createTitle:'FORJA A TU GLADIADOR', namePh:'Nombre del gladiador', defName:'Gladiador', ptsLeft:'Puntos restantes:',
+ balanced:'EQUILIBRADO', resetPts:'REINICIAR', looks:'APARIENCIA',
+ c_skin:'Piel', c_hair:'Cabello', c_armor:'Armadura', c_cloth:'Tela', c_metal:'Metal', c_boots:'Botas',
+ optHelmet:'Yelmo', optLong:'Cabello largo', yes:'SÍ', no:'NO', randomLook:'AL AZAR', defaultLook:'ORIGINAL',
+ scarsTitle:'CICATRICES HEREDADAS', noScars:'Ninguna aún. Inauguras el linaje (Generación {g}).', scarCount:'{n}/{m} · Generación {g}',
+ needPoints:'Reparte todos los puntos antes de luchar.', fight:'LUCHAR →', back:'← VOLVER',
+ pvHp:'HP', pvSta:'STA', pvCrowd:'Público', pvFire:'Resist. al fuego',
+ attr_pow:'PODER', attr_agi:'AGILIDAD', attr_vit:'VITALIDAD', attr_cha:'CARISMA', attr_end:'RESISTENCIA',
+ attrd_pow:'Daño de ataque y magia', attrd_agi:'Precisión, críticos y alcance de movimiento', attrd_vit:'Puntos de vida',
+ attrd_cha:'Favor inicial y economía del público', attrd_end:'Stamina máxima y descanso',
+ ab_pow:'POD', ab_agi:'AGI', ab_vit:'VIT', ab_cha:'CAR', ab_end:'RES',
+ heroYou:'TÚ', hero_thrax:'THRAX', hero_lysandra:'LYSANDRA', hero_pillar:'EL PILAR', hero_antares:'ANTARES',
+ name_thrax:'Thrax el Cruel', name_lysandra:'Lysandra Velo de Sangre', name_pillar:'El Pilar', name_antares:'Emperador Antares',
+ title_thrax:'El Carnicero de Tebas', title_lysandra:'La Bailarina de las Dagas', title_pillar:'Muralla de Hierro', title_antares:'Señor de la Arena',
+ scar_fire:'Cicatriz Quemada', scard_fire:'Resistencia al fuego +20%, Poder +1, HP -5',
+ scar_blade:'Cicatriz de Hoja', scard_blade:'HP +5, Poder +1, Agilidad -1',
+ scar_stone:'Cicatriz de la Multitud', scard_stone:'Carisma +3',
+ death_fire:'Fuiste consumido por las llamas de la arena.', death_blade:'Caíste en combate, bajo el acero del adversario.', death_stone:'El público te apedreó hasta la muerte.',
+ life:'VIDA', sta:'STAMINA', crowd:'PÚBLICO', limbs:'MIEMBROS', guard:'GUARDIA', genLine:'Generación {g} · Resist. al fuego {r}%', level:'Nivel {n}',
+ limbOk:'OK', limbLostTxt:'PERDIDO', none:'Ninguna',
+ limb_armR:'Brazo D', limb_armL:'Brazo I', limb_legR:'Pierna D', limb_legL:'Pierna I',
+ topFight:'COMBATE {n}/{m}', topTurn:'TURNO {n}', fireIn:'fuego en {n}', fireMax:'fuego al límite', pillarIn:'pilar en {n}',
+ tod_day:'DÍA', tod_dusk:'ATARDECER', tod_night:'NOCHE', tod_dawn:'AMANECER',
+ todLog_day:'Día: el sol castiga la arena.', todLog_dusk:'Atardecer: el cielo sangra sobre la arena.',
+ todLog_night:'Noche: las antorchas iluminan el combate.', todLog_dawn:'Amanecer: la luz dorada anuncia el último duelo.',
+ act_mv:'MOVER', act_at:'ATACAR', act_df:'DEFENDER', act_rs:'DESCANSAR', act_mg:'MAGIA DE FUEGO', act_tn:'PROVOCAR', costSta:'{n} STA', restInfo:'+STA +3 HP',
+ logFight:'== COMBATE {n}/{m}: {name}, {title} ==', logHint:'Haz clic en una celda resaltada para mover. ATACAR alcanza 1.5 casillas; MAGIA alcanza 3.',
+ miss:'FALLO', guarded:' (defendido)', dismemberFloat:'¡DESMEMBRADO!',
+ logMiss:'{a} ataca y FALLA contra {d}.', logHit:'{a} golpea a {d}: -{n} HP{g}.', logCrit:'{a} asesta un CRÍTICO a {d}: -{n} HP{g}.',
+ logFire:'{a} conjura MAGIA DE FUEGO: -{n} HP a {d}.', logRest:'{a} descansa y recupera el aliento.',
+ logLimbLost:'¡{d} pierde {limb}! ¡DESMEMBRADO!', logLimbBroke:'¡{limb} de {d} queda destrozado!', logLimbHurt:'{limb} de {d} queda herido ({hp}/{max}).',
+ logBurn:'{f} se quema en las baldosas en llamas: -{n} HP.', logFireAdv:'¡El FUEGO avanza: la columna {c} arde!', logFireMax:'Las llamas ya cubren la mitad de la arena.',
+ logPillar:'¡Un PILAR se desploma en la arena (columna {c}, fila {r})!', logPush:'{f} es empujado por el pilar.', logCrush:'{f} es aplastado por el pilar: -{n} HP.',
+ logStone:'¡El público ({fav}%) lanza una piedra a {t}!', logMove:'{p} se mueve a ({c},{r}).', logAdvance:'{e} avanza a ({c},{r}).',
+ logGuardE:'{e} levanta la guardia.', logDagger:'¡{e} golpea de nuevo con la segunda daga!', logDefend:'{p} alza el escudo: daño cuerpo a cuerpo reducido en 50%.',
+ logTaunt:'¡{p} PROVOCA al público! Favor +{g}.', logBread:'¡El público lanza pan y una poción! +{h} HP.', logBoo:'El público solo abuchea... sin regalos.',
+ msgMoveHint:'Elige una celda resaltada para mover.', msgFarEnemy:'El enemigo está demasiado lejos para atacar.', msgPillar:'Un pilar bloquea el camino.',
+ msgOutRange:'Fuera del alcance de movimiento.', msgNoLegs:'¡Sin piernas no puedes moverte!', msgNoSta:'Stamina insuficiente para mover.',
+ msgTargetFar:'Objetivo fuera de alcance. Acércate (MOVER).', msgMagicFar:'Objetivo fuera del alcance de la magia (3 casillas).',
+ logVictory:'¡{e} cae! ¡La arena ruge tu nombre!', logDefeat:'{p} cae sobre la arena...',
+ blessTitle:'¡VICTORIA!', blessP1:'{e} ha sido derrotado. Los curanderos tratan tus heridas (+{h}% de vida, miembros restaurados).',
+ blessP2:'Recibe la bendición de la arena y elige un atributo:', blessNone:'SEGUIR SIN BENDICIÓN', plusAttr:'+1 {a}',
+ deathTitle:'HAS MUERTO', deathBy:'Caíste ante {e} (combate {n}/{m}).', scarMade:'CICATRIZ OBTENIDA', scarsNext:'CICATRICES HEREDADAS POR EL SIGUIENTE ({n}/{m})',
+ nextGlad:'SIGUIENTE GLADIADOR (GENERACIÓN {g}) →', toMenu:'MENÚ INICIAL',
+ win1:'LEYENDA', win2:'DE LA ARENA', winSub:'el emperador ha caído', winP1:'{p} derrotó a todos los campeones de la arena, hasta el Emperador Antares.',
+ winP2:'Tu linaje ya tiene {w} victoria(s). Las cicatrices pasan al siguiente gladiador ({n}/{m}).', newGlad:'NUEVO GLADIADOR (GENERACIÓN {g}) →'
+}
+};
+let LANG = 'pt';
+function t(k,v){
+  let s = (I18N[LANG] && I18N[LANG][k] !== undefined) ? I18N[LANG][k] : (I18N.pt[k] !== undefined ? I18N.pt[k] : k);
+  if(v) for(const x in v) s = s.split('{'+x+'}').join(v[x]);
+  return s;
+}
+Object.assign(I18N.pt,{
+ wx_clear:'LIMPO', wx_rain:'CHUVA', wx_sand:'TEMPESTADE',
+ wxLog_clear:'Céu limpo: nada interfere no combate.',
+ wxLog_rain:'Chuva forte: o fogo enfraquece (-40%) e a arena vira lama (mover custa mais).',
+ wxLog_sand:'Tempestade de areia: precisão -10%, magia com 1 casa a menos de alcance e dunas fofas atrapalham o movimento.',
+ logLightning:'Um relâmpago ilumina a arena!',
+ verdictTitle:'O VEREDITO', verdictCrowd:'A plateia ({p}%) aguarda o destino de {e}.',
+ verdictMercyWish:'A multidão pede CLEMÊNCIA!', verdictBloodWish:'A multidão exige SANGUE!',
+ spare:'POUPAR', execute:'EXECUTAR',
+ verdictFollow:'A plateia ruge de aprovação! (+12 de favor no próximo combate)',
+ verdictDefy:'A plateia vaia a sua decisão! (-12 de favor), mas sua ousadia rende +1 {a}.',
+ logSpare:'{p} poupa {e}.', logExecute:'{p} executa {e} diante da multidão.'
+});
+Object.assign(I18N.en,{
+ wx_clear:'CLEAR', wx_rain:'RAIN', wx_sand:'SANDSTORM',
+ wxLog_clear:'Clear sky: nothing interferes with the fight.',
+ wxLog_rain:'Heavy rain: fire weakens (-40%) and the arena turns to mud (moving costs more).',
+ wxLog_sand:'Sandstorm: accuracy -10%, magic reaches 1 cell less and loose dunes slow your movement.',
+ logLightning:'Lightning lights up the arena!',
+ verdictTitle:'THE VERDICT', verdictCrowd:'The crowd ({p}%) awaits the fate of {e}.',
+ verdictMercyWish:'The crowd begs for MERCY!', verdictBloodWish:'The crowd demands BLOOD!',
+ spare:'SPARE', execute:'EXECUTE',
+ verdictFollow:'The crowd roars in approval! (+12 favor in the next fight)',
+ verdictDefy:'The crowd boos your decision! (-12 favor), but your boldness earns +1 {a}.',
+ logSpare:'{p} spares {e}.', logExecute:'{p} executes {e} before the crowd.'
+});
+Object.assign(I18N.es,{
+ wx_clear:'DESPEJADO', wx_rain:'LLUVIA', wx_sand:'TORMENTA',
+ wxLog_clear:'Cielo despejado: nada interfiere en el combate.',
+ wxLog_rain:'Lluvia fuerte: el fuego se debilita (-40%) y la arena se vuelve barro (moverse cuesta más).',
+ wxLog_sand:'Tormenta de arena: precisión -10%, la magia alcanza 1 casilla menos y las dunas sueltas dificultan el movimiento.',
+ logLightning:'¡Un relámpago ilumina la arena!',
+ verdictTitle:'EL VEREDICTO', verdictCrowd:'El público ({p}%) espera el destino de {e}.',
+ verdictMercyWish:'¡La multitud pide CLEMENCIA!', verdictBloodWish:'¡La multitud exige SANGRE!',
+ spare:'PERDONAR', execute:'EJECUTAR',
+ verdictFollow:'¡El público ruge de aprobación! (+12 de favor en el próximo combate)',
+ verdictDefy:'¡El público abuchea tu decisión! (-12 de favor), pero tu osadía te da +1 {a}.',
+ logSpare:'{p} perdona a {e}.', logExecute:'{p} ejecuta a {e} ante la multitud.'
+});
+Object.assign(I18N.pt,{
+ modeTitle:'MODO DE JOGO', mode_campaign:'CAMPANHA', mode_endless:'INFINITO', mode_daily:'DESAFIO DIÁRIO',
+ moded_campaign:'8 campeões em sequência. Vença todos para virar lenda.', moded_endless:'Ondas sem fim, cada vez mais fortes. Até onde você vai?',
+ moded_daily:'O mesmo desafio para todos hoje: 5 lutas e um modificador.',
+ dailyMod_glass:'Vidro: inimigos com 30% menos vida, mas golpes mais fortes.', dailyMod_iron:'Ferro: inimigos com 30% mais vida.',
+ dailyMod_storm:'Tempestade: todas as lutas sob tempestade de areia.', dailyMod_flood:'Dilúvio: todas as lutas sob chuva.',
+ dailyBest:'Melhor de hoje: {n} lutas.', endlessBest:'Recorde: {n} vitórias.',
+ name_aldric:'Sir Aldric, o Cavaleiro Negro', title_aldric:'Escudo de Ébano', name_zahra:'Zahra a Feiticeira', title_zahra:'Chama Viva',
+ name_gorm:'Gorm o Gigante', title_gorm:'Fúria do Norte', name_nyx:'Nyx a Sombra', title_nyx:'Lâmina Sem Rosto',
+ hero_aldric:'ALDRIC', hero_zahra:'ZAHRA', hero_gorm:'GORM', hero_nyx:'NYX',
+ act_hv:'PESADO', act_qk:'RÁPIDO', act_dg:'ESQUIVAR',
+ logHeavy:'{a} desfere um GOLPE PESADO!', logQuick:'{a} ataca em sequência!', logDodgeStance:'{p} assume postura de esquiva.',
+ logDodged:'{d} ESQUIVA do golpe de {a}!', logCounter:'{d} contra-ataca {a}!', floatDodge:'ESQUIVA', immune:'IMUNE',
+ logStun:'{d} fica ATORDOADO!', logStunned:'{e} está atordoado e perde o turno.', logStunnedP:'{p} está atordoado e perde o turno!',
+ logBleed:'{d} começa a SANGRAR!', logBleedTick:'{f} sangra: -{n} HP.', logBurnOn:'{d} está em CHAMAS!', logBurnTick:'{f} queima: -{n} HP.',
+ logRainOut:'A chuva apaga as chamas em {f}.', logFury:'{e} entra em FÚRIA!', fury:'FÚRIA!', logBlink:'{e} some numa nuvem de fogo e reaparece longe!',
+ logCombo:'COMBO x{n}!', stat_bleed:'SANGRAMENTO', stat_burn:'QUEIMADURA', stat_stun:'ATORDOADO', combo:'COMBO',
+ legacyBtn:'LEGADO', legacyTitle:'LEGADO DA LINHAGEM', glory:'Glória', gloryTotal:'Glória total conquistada: {n}', gloryGain:'Glória ganha: +{n} (total {t})',
+ perksTitle:'HABILIDADES ANCESTRAIS', rankTxt:'Nível {r}/{m}', maxed:'MÁXIMO', buy:'COMPRAR ({c})',
+ perk_vit:'Vigor Ancestral', perkd_vit:'+6 de vida máxima por nível', perk_sta:'Fôlego de Ferro', perkd_sta:'+5 de stamina máxima por nível',
+ perk_pts:'Mão Treinada', perkd_pts:'+1 ponto de atributo na criação por nível', perk_fav:'Carisma Herdado', perkd_fav:'+4 de favor inicial da plateia por nível',
+ perk_heal:'Curandeiros Leais', perkd_heal:'+8% de cura entre combates por nível', perk_scar:'Pele de Cicatrizes', perkd_scar:'+1 espaço de cicatriz por nível',
+ perk_resist:'Sangue Frio', perkd_resist:'-15% de dano de sangramento e queimadura por nível',
+ achTitle:'CONQUISTAS', achUnlocked:'Conquista: {n} (+15 de Glória)',
+ ach_first:'Primeiro Sangue', achd_first:'Vença uma luta.', ach_champ:'Campeão da Arena', achd_champ:'Vença a campanha inteira.',
+ ach_maimed:'Vivo, mas Mutilado', achd_maimed:'Vença uma luta tendo perdido 2 ou mais membros.', ach_crowd:'Querido da Plateia', achd_crowd:'Chegue a 100% de favor.',
+ ach_merciful:'Misericordioso', achd_merciful:'Poupe 3 inimigos.', ach_blood:'Sanguinário', achd_blood:'Execute 3 inimigos.',
+ ach_survivor:'Sobrevivente', achd_survivor:'Vença 8 lutas no modo infinito.', ach_dynasty:'Dinastia', achd_dynasty:'Alcance a geração 5.',
+ ach_storm:'Filho da Tempestade', achd_storm:'Vença sob chuva ou tempestade de areia.', ach_daily:'Desafiante do Dia', achd_daily:'Complete um desafio diário.',
+ hallTitle:'GALERIA DE LENDAS', hallEmpty:'Nenhum gladiador ainda.', genShort:'Ger. {g}', hallKills:'{k} vitórias',
+ cause_fire:'queimado', cause_blade:'em combate', cause_stone:'apedrejado', cause_win:'venceu a arena',
+ rank_0:'Novato', rank_1:'Gladiador', rank_2:'Veterano', rank_3:'Campeão', rank_4:'Lenda'
+});
+Object.assign(I18N.en,{
+ modeTitle:'GAME MODE', mode_campaign:'CAMPAIGN', mode_endless:'ENDLESS', mode_daily:'DAILY CHALLENGE',
+ moded_campaign:'8 champions in a row. Beat them all to become a legend.', moded_endless:'Endless waves, each one stronger. How far can you go?',
+ moded_daily:'The same challenge for everyone today: 5 fights and a modifier.',
+ dailyMod_glass:'Glass: enemies have 30% less life but hit harder.', dailyMod_iron:'Iron: enemies have 30% more life.',
+ dailyMod_storm:'Storm: every fight under a sandstorm.', dailyMod_flood:'Flood: every fight in the rain.',
+ dailyBest:'Best today: {n} fights.', endlessBest:'Record: {n} wins.',
+ name_aldric:'Sir Aldric, the Black Knight', title_aldric:'Shield of Ebony', name_zahra:'Zahra the Sorceress', title_zahra:'Living Flame',
+ name_gorm:'Gorm the Giant', title_gorm:'Fury of the North', name_nyx:'Nyx the Shadow', title_nyx:'Faceless Blade',
+ hero_aldric:'ALDRIC', hero_zahra:'ZAHRA', hero_gorm:'GORM', hero_nyx:'NYX',
+ act_hv:'HEAVY', act_qk:'QUICK', act_dg:'DODGE',
+ logHeavy:'{a} delivers a HEAVY BLOW!', logQuick:'{a} strikes in a flurry!', logDodgeStance:'{p} takes a dodging stance.',
+ logDodged:'{d} DODGES {a}\'s blow!', logCounter:'{d} counterattacks {a}!', floatDodge:'DODGE', immune:'IMMUNE',
+ logStun:'{d} is STUNNED!', logStunned:'{e} is stunned and loses the turn.', logStunnedP:'{p} is stunned and loses the turn!',
+ logBleed:'{d} starts BLEEDING!', logBleedTick:'{f} bleeds: -{n} HP.', logBurnOn:'{d} is ON FIRE!', logBurnTick:'{f} burns: -{n} HP.',
+ logRainOut:'The rain puts out the flames on {f}.', logFury:'{e} goes into a FURY!', fury:'FURY!', logBlink:'{e} vanishes in a cloud of fire and reappears far away!',
+ logCombo:'COMBO x{n}!', stat_bleed:'BLEEDING', stat_burn:'BURNING', stat_stun:'STUNNED', combo:'COMBO',
+ legacyBtn:'LEGACY', legacyTitle:'LINEAGE LEGACY', glory:'Glory', gloryTotal:'Total glory earned: {n}', gloryGain:'Glory earned: +{n} (total {t})',
+ perksTitle:'ANCESTRAL SKILLS', rankTxt:'Level {r}/{m}', maxed:'MAX', buy:'BUY ({c})',
+ perk_vit:'Ancestral Vigor', perkd_vit:'+6 max life per level', perk_sta:'Iron Breath', perkd_sta:'+5 max stamina per level',
+ perk_pts:'Trained Hand', perkd_pts:'+1 attribute point at creation per level', perk_fav:'Inherited Charisma', perkd_fav:'+4 starting crowd favor per level',
+ perk_heal:'Loyal Healers', perkd_heal:'+8% healing between fights per level', perk_scar:'Skin of Scars', perkd_scar:'+1 scar slot per level',
+ perk_resist:'Cold Blood', perkd_resist:'-15% bleeding and burning damage per level',
+ achTitle:'ACHIEVEMENTS', achUnlocked:'Achievement: {n} (+15 Glory)',
+ ach_first:'First Blood', achd_first:'Win a fight.', ach_champ:'Champion of the Arena', achd_champ:'Beat the whole campaign.',
+ ach_maimed:'Alive, but Maimed', achd_maimed:'Win a fight after losing 2 or more limbs.', ach_crowd:'Crowd Favorite', achd_crowd:'Reach 100% favor.',
+ ach_merciful:'Merciful', achd_merciful:'Spare 3 enemies.', ach_blood:'Bloodthirsty', achd_blood:'Execute 3 enemies.',
+ ach_survivor:'Survivor', achd_survivor:'Win 8 fights in endless mode.', ach_dynasty:'Dynasty', achd_dynasty:'Reach generation 5.',
+ ach_storm:'Child of the Storm', achd_storm:'Win under rain or a sandstorm.', ach_daily:'Daily Challenger', achd_daily:'Complete a daily challenge.',
+ hallTitle:'HALL OF LEGENDS', hallEmpty:'No gladiators yet.', genShort:'Gen. {g}', hallKills:'{k} wins',
+ cause_fire:'burned', cause_blade:'in combat', cause_stone:'stoned', cause_win:'conquered the arena',
+ rank_0:'Rookie', rank_1:'Gladiator', rank_2:'Veteran', rank_3:'Champion', rank_4:'Legend'
+});
+Object.assign(I18N.es,{
+ modeTitle:'MODO DE JUEGO', mode_campaign:'CAMPAÑA', mode_endless:'INFINITO', mode_daily:'DESAFÍO DIARIO',
+ moded_campaign:'8 campeones seguidos. Véncelos a todos para ser leyenda.', moded_endless:'Oleadas sin fin, cada vez más fuertes. ¿Hasta dónde llegarás?',
+ moded_daily:'El mismo desafío para todos hoy: 5 combates y un modificador.',
+ dailyMod_glass:'Cristal: enemigos con 30% menos vida, pero golpean más fuerte.', dailyMod_iron:'Hierro: enemigos con 30% más vida.',
+ dailyMod_storm:'Tormenta: todos los combates bajo tormenta de arena.', dailyMod_flood:'Diluvio: todos los combates bajo la lluvia.',
+ dailyBest:'Mejor de hoy: {n} combates.', endlessBest:'Récord: {n} victorias.',
+ name_aldric:'Sir Aldric, el Caballero Negro', title_aldric:'Escudo de Ébano', name_zahra:'Zahra la Hechicera', title_zahra:'Llama Viva',
+ name_gorm:'Gorm el Gigante', title_gorm:'Furia del Norte', name_nyx:'Nyx la Sombra', title_nyx:'Hoja sin Rostro',
+ hero_aldric:'ALDRIC', hero_zahra:'ZAHRA', hero_gorm:'GORM', hero_nyx:'NYX',
+ act_hv:'PESADO', act_qk:'RÁPIDO', act_dg:'ESQUIVAR',
+ logHeavy:'¡{a} descarga un GOLPE PESADO!', logQuick:'¡{a} ataca en ráfaga!', logDodgeStance:'{p} adopta postura de esquiva.',
+ logDodged:'¡{d} ESQUIVA el golpe de {a}!', logCounter:'¡{d} contraataca a {a}!', floatDodge:'ESQUIVA', immune:'INMUNE',
+ logStun:'¡{d} queda ATURDIDO!', logStunned:'{e} está aturdido y pierde el turno.', logStunnedP:'¡{p} está aturdido y pierde el turno!',
+ logBleed:'¡{d} empieza a SANGRAR!', logBleedTick:'{f} sangra: -{n} HP.', logBurnOn:'¡{d} está en LLAMAS!', logBurnTick:'{f} se quema: -{n} HP.',
+ logRainOut:'La lluvia apaga las llamas en {f}.', logFury:'¡{e} entra en FURIA!', fury:'¡FURIA!', logBlink:'¡{e} desaparece en una nube de fuego y reaparece lejos!',
+ logCombo:'¡COMBO x{n}!', stat_bleed:'SANGRADO', stat_burn:'QUEMADURA', stat_stun:'ATURDIDO', combo:'COMBO',
+ legacyBtn:'LEGADO', legacyTitle:'LEGADO DEL LINAJE', glory:'Gloria', gloryTotal:'Gloria total conseguida: {n}', gloryGain:'Gloria ganada: +{n} (total {t})',
+ perksTitle:'HABILIDADES ANCESTRALES', rankTxt:'Nivel {r}/{m}', maxed:'MÁXIMO', buy:'COMPRAR ({c})',
+ perk_vit:'Vigor Ancestral', perkd_vit:'+6 de vida máxima por nivel', perk_sta:'Aliento de Hierro', perkd_sta:'+5 de stamina máxima por nivel',
+ perk_pts:'Mano Entrenada', perkd_pts:'+1 punto de atributo en la creación por nivel', perk_fav:'Carisma Heredado', perkd_fav:'+4 de favor inicial del público por nivel',
+ perk_heal:'Curanderos Leales', perkd_heal:'+8% de curación entre combates por nivel', perk_scar:'Piel de Cicatrices', perkd_scar:'+1 espacio de cicatriz por nivel',
+ perk_resist:'Sangre Fría', perkd_resist:'-15% de daño por sangrado y quemadura por nivel',
+ achTitle:'LOGROS', achUnlocked:'Logro: {n} (+15 de Gloria)',
+ ach_first:'Primera Sangre', achd_first:'Gana un combate.', ach_champ:'Campeón de la Arena', achd_champ:'Gana toda la campaña.',
+ ach_maimed:'Vivo, pero Mutilado', achd_maimed:'Gana un combate habiendo perdido 2 o más miembros.', ach_crowd:'Favorito del Público', achd_crowd:'Llega al 100% de favor.',
+ ach_merciful:'Misericordioso', achd_merciful:'Perdona a 3 enemigos.', ach_blood:'Sanguinario', achd_blood:'Ejecuta a 3 enemigos.',
+ ach_survivor:'Superviviente', achd_survivor:'Gana 8 combates en modo infinito.', ach_dynasty:'Dinastía', achd_dynasty:'Alcanza la generación 5.',
+ ach_storm:'Hijo de la Tormenta', achd_storm:'Gana bajo la lluvia o una tormenta de arena.', ach_daily:'Retador del Día', achd_daily:'Completa un desafío diario.',
+ hallTitle:'GALERÍA DE LEYENDAS', hallEmpty:'Aún no hay gladiadores.', genShort:'Gen. {g}', hallKills:'{k} victorias',
+ cause_fire:'quemado', cause_blade:'en combate', cause_stone:'apedreado', cause_win:'conquistó la arena',
+ rank_0:'Novato', rank_1:'Gladiador', rank_2:'Veterano', rank_3:'Campeón', rank_4:'Leyenda'
+});
+
+/* =====================================================================
+   PROGRESSÃO ENTRE GERAÇÕES: Legado, Glória, conquistas e modos de jogo
+   ===================================================================== */
+const LEG_KEY = 'gladiators_arena_legacy_v1', MODE_KEY = 'gladiators_arena_mode_v1';
+const PERKS = {
+  vit:   { max:5, cost:[15,25,40,60,90] },
+  sta:   { max:5, cost:[15,25,40,60,90] },
+  pts:   { max:3, cost:[40,80,140] },
+  fav:   { max:5, cost:[10,20,30,45,65] },
+  heal:  { max:5, cost:[10,20,35,50,70] },
+  scar:  { max:3, cost:[30,60,100] },
+  resist:{ max:3, cost:[25,50,90] }
+};
+const PERK_KEYS = Object.keys(PERKS);
+const ACH_IDS = ['first','champ','maimed','crowd','merciful','blood','survivor','dynasty','storm','daily'];
+const newLeg = () => ({ glory:0, earned:0, ranks:{vit:0,sta:0,pts:0,fav:0,heal:0,scar:0,resist:0}, hall:[], ach:{},
+                        stats:{wins:0,spared:0,executed:0}, bestEndless:0, daily:{date:'',best:0} });
+let LEG = newLeg(), MODE = 'campaign';
+function loadLeg(){
+  try{
+    const j = JSON.parse(localStorage.getItem(LEG_KEY));
+    if(j){
+      const d = newLeg(); LEG = Object.assign(d, j);
+      LEG.ranks = Object.assign(newLeg().ranks, j.ranks||{});
+      LEG.stats = Object.assign(newLeg().stats, j.stats||{});
+      LEG.daily = Object.assign({date:'',best:0}, j.daily||{});
+    }
+  }catch(e){}
+  try{ const m = localStorage.getItem(MODE_KEY); if(m && ['campaign','endless','daily'].indexOf(m)>=0) MODE = m; }catch(e){}
+}
+function saveLeg(){ try{ localStorage.setItem(LEG_KEY, JSON.stringify(LEG)); }catch(e){} }
+const maxScars = () => 5 + (LEG ? LEG.ranks.scar : 0);
+const pool = () => POOL + (LEG ? LEG.ranks.pts : 0);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]);
+
+/* título que cresce com a Glória total ganha pela linhagem */
+function legendTitle(){
+  const e = LEG.earned, i = e>=800 ? 4 : (e>=400 ? 3 : (e>=180 ? 2 : (e>=60 ? 1 : 0)));
+  return t('rank_'+i);
+}
+let toastT = null;
+function toast(msg){
+  const el = $('toast'); el.textContent = msg; el.classList.add('show');
+  clearTimeout(toastT); toastT = setTimeout(()=>el.classList.remove('show'),3400);
+}
+function unlockAch(id){
+  if(LEG.ach[id]) return;
+  LEG.ach[id] = Date.now(); LEG.glory += 15; LEG.earned += 15; saveLeg();
+  toast('★ '+t('achUnlocked',{n:t('ach_'+id)})); sfx('bless');
+}
+
+/* ---------- Modos: Campanha, Infinito e Desafio Diário ---------- */
+function mulberry32(a){ return function(){ a|=0; a=a+0x6D2B79F5|0; let x=Math.imul(a^a>>>15,1|a); x=x+Math.imul(x^x>>>7,61|x)^x; return ((x^x>>>14)>>>0)/4294967296; }; }
+function dateKey(){ const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+/* o desafio do dia é igual para todos: mesma ordem de campeões e mesmo modificador */
+function dailyConfig(){
+  const key = dateKey(); let h = 0;
+  for(let i=0;i<key.length;i++) h = (h*31 + key.charCodeAt(i))|0;
+  const rng = mulberry32(h), pl = CHAMPS.filter(c=>c.id!=='antares').map(c=>c.id);
+  for(let i=pl.length-1;i>0;i--){ const j=Math.floor(rng()*(i+1)); const x=pl[i]; pl[i]=pl[j]; pl[j]=x; }
+  const mods = [{id:'glass',hp:.7,pow:2},{id:'iron',hp:1.3,pow:0},{id:'storm',hp:1,pow:0,weather:'sand'},{id:'flood',hp:1,pow:0,weather:'rain'}];
+  return { key, seq:pl.slice(0,4).concat(['antares']), mod:mods[Math.floor(rng()*mods.length)] };
+}
+function setMode(m){ MODE = m; try{ localStorage.setItem(MODE_KEY,m); }catch(e){} renderModes(); }
+function renderModes(){
+  const d = dailyConfig();
+  const info = {
+    campaign: t('moded_campaign'),
+    endless:  t('moded_endless') + (LEG.bestEndless ? ' '+t('endlessBest',{n:LEG.bestEndless}) : ''),
+    daily:    t('moded_daily') + ' ' + t('dailyMod_'+d.mod.id) + (LEG.daily.date===d.key ? ' '+t('dailyBest',{n:LEG.daily.best}) : '')
+  };
+  $('modeBox').innerHTML = `<div class="modes">${['campaign','endless','daily'].map(m=>
+    `<button class="tgl mode${MODE===m?' on':''}" onclick="setMode('${m}')">${t('mode_'+m)}</button>`).join('')}</div><p class="modeInfo">${info[MODE]}</p>`;
+}
+function startMode(){
+  S.mode = MODE; S.kills = 0; S.dailyMod = null; S.dailySeq = [];
+  if(MODE==='campaign') S.total = CHAMPS.length;
+  else if(MODE==='endless') S.total = Infinity;
+  else { const d = dailyConfig(); S.total = d.seq.length; S.dailySeq = d.seq; S.dailyMod = d.mod; S.dailyKey = d.key; }
+}
+const totalLabel = () => S.total===Infinity ? '∞' : S.total;
+const threat = () => 1 + .02*Object.values(LEG.ranks).reduce((a,b)=>a+b,0);   // linhagem forte, inimigos mais duros
+/* configuração do campeão da luta i, conforme o modo */
+function cfgFor(i){
+  const base = S.mode==='daily' ? CHAMPS.find(c=>c.id===S.dailySeq[i]) : CHAMPS[i % CHAMPS.length];
+  let hp = base.hp, pow = base.pow, sta = base.sta;
+  if(S.mode==='endless'){ const k = 1 + .1*i + .08*Math.floor(i/CHAMPS.length); hp = Math.round(hp*k); pow += Math.floor(i/3); sta += Math.floor(i/2)*2; }
+  if(S.mode==='daily' && S.dailyMod){ hp = Math.round(hp*S.dailyMod.hp); pow += S.dailyMod.pow; }
+  hp = Math.round(hp*threat());
+  return Object.assign({}, base, { hp, pow, sta });
+}
+
+/* ---------- Glória, conquistas e galeria ---------- */
+function onKill(){
+  LEG.stats.wins++; unlockAch('first');
+  const L = S.player.limbs;
+  if(Object.keys(L).filter(k=>L[k].lost).length>=2) unlockAch('maimed');
+  if(S.weather!=='clear') unlockAch('storm');
+  if(S.mode==='endless' && S.kills>=8) unlockAch('survivor');
+  saveLeg();
+}
+function onVerdict(c){
+  if(c==='spare'){ LEG.stats.spared++; if(LEG.stats.spared>=3) unlockAch('merciful'); }
+  else { LEG.stats.executed++; if(LEG.stats.executed>=3) unlockAch('blood'); }
+  saveLeg();
+}
+function finishRun(win,cause){
+  const kills = S.kills;
+  let gl = kills*8 + (win ? 60 : 0) + (S.mode==='endless' ? kills*2 : 0) + (S.mode==='daily' && win ? 25 : 0);
+  if(S.mode==='daily') gl = Math.round(gl*1.2);
+  LEG.glory += gl; LEG.earned += gl;
+  if(S.mode==='endless') LEG.bestEndless = Math.max(LEG.bestEndless,kills);
+  if(S.mode==='daily'){
+    if(LEG.daily.date!==S.dailyKey) LEG.daily = { date:S.dailyKey, best:0 };
+    LEG.daily.best = Math.max(LEG.daily.best,kills);
+    if(win) unlockAch('daily');
+  }
+  if(win && S.mode==='campaign') unlockAch('champ');
+  if(LIN.gen>=5) unlockAch('dynasty');
+  LEG.hall.unshift({ name:S.player.name, gen:LIN.gen-1, mode:S.mode, kills, cause:win ? 'win' : cause, date:dateKey() });
+  LEG.hall = LEG.hall.slice(0,12);
+  saveLeg();
+  return gl;
+}
+
+/* ---------- Tela do Legado ---------- */
+function renderLegBtn(){ const b=$('legBtn'); if(b) b.textContent = t('legacyBtn')+' ★ '+LEG.glory; }
+function goLegacy(){ show('sLegacy'); renderLegacy(); }
+function buyPerk(k){
+  const P = PERKS[k], r = LEG.ranks[k]; if(r>=P.max) return;
+  const c = P.cost[r]; if(LEG.glory<c) return;
+  LEG.glory -= c; LEG.ranks[k]++; saveLeg(); sfx('bless'); renderLegacy(); renderLegBtn();
+}
+function renderLegacy(){
+  $('legHead').innerHTML = `<b>★ ${t('glory')}: ${LEG.glory}</b> · ${legendTitle()}<br><small>${t('gloryTotal',{n:LEG.earned})}</small>`;
+  $('perkBox').innerHTML = PERK_KEYS.map(k=>{
+    const P=PERKS[k], r=LEG.ranks[k], c=P.cost[r];
+    return `<div class="perk"><div><b>${t('perk_'+k)}</b> <small>${t('rankTxt',{r,m:P.max})}</small><em>${t('perkd_'+k)}</em></div>`
+      + (r>=P.max ? `<span>${t('maxed')}</span>` : `<button class="btn ghost" ${LEG.glory<c?'disabled':''} onclick="buyPerk('${k}')">${t('buy',{c})}</button>`) + `</div>`;
+  }).join('');
+  $('achBox').innerHTML = ACH_IDS.map(id=>
+    `<div class="ach${LEG.ach[id]?'':' lock'}"><b>${LEG.ach[id]?'★':'☆'} ${t('ach_'+id)}</b><br><small>${t('achd_'+id)}</small></div>`).join('');
+  $('hallBox').innerHTML = LEG.hall.length
+    ? LEG.hall.map(h=>`<div class="scarItem"><b>${esc(h.name)}</b> (${t('genShort',{g:h.gen})}) · ${t('mode_'+h.mode)} · ${t('hallKills',{k:h.kills})} · ${t('cause_'+h.cause)}<em>${h.date}</em></div>`).join('')
+    : `<div class="scarItem" style="border:0">${t('hallEmpty')}</div>`;
+}
+
+/* =====================================================================
+   CLIMA, TERRENO, PLATEIA, PESO NOS GOLPES E FERIMENTOS (efeitos)
+   ===================================================================== */
+const WX_IC = { clear:'☼', rain:'☂', sand:'≋' };
+const wxIc = w => WX_IC[w] || '';
+/* Primeiro combate sempre com céu limpo; os demais sorteiam o clima */
+function pickWeather(i){ if(S.mode==='daily' && S.dailyMod && S.dailyMod.weather) return S.dailyMod.weather; if(i===0) return 'clear'; const pool=['clear','rain','sand','rain','sand']; return pool[rnd(0,pool.length-1)]; }
+const terrainAt = (c,r) => S.terrain[c+','+r] || '';
+const terrainCost = (c,r) => { const k=terrainAt(c,r); return k==='mud' ? 5 : (k==='drift' ? 3 : 0); };
+const magicRange = () => S.weather==='sand' ? MAGIC_RANGE-1 : MAGIC_RANGE;   // tempestade de areia: magia alcança menos
+const fireMult = () => S.weather==='rain' ? .6 : 1;                           // chuva: fogo da arena enfraquece
+
+function addTerrain(kind){
+  if(Object.keys(S.terrain).filter(k => S.terrain[k]===kind).length >= 14) return;
+  for(let n=0;n<30;n++){
+    const c=rnd(0,COLS-1), r=rnd(0,ROWS-1);
+    if(S.terrain[c+','+r] || pillarAt(c,r) || occupied(c,r)) continue;
+    S.terrain[c+','+r] = kind; return;
+  }
+}
+function setWeather(i){
+  S.weather = pickWeather(i); S.terrain = {};
+  const col = $('arenaCol'); col.classList.remove('wx-rain','wx-sand');
+  if(S.weather!=='clear') col.classList.add('wx-'+S.weather);
+  if(S.weather==='rain') for(let k=0;k<3;k++) addTerrain('mud');
+  if(S.weather==='sand') for(let k=0;k<3;k++) addTerrain('drift');
+  const b = $('todBanner'); if(S.weather!=='clear') b.textContent += '   '+wxIc(S.weather)+' '+t('wx_'+S.weather);
+  log(t('wxLog_'+S.weather),'l-sys');
+}
+/* a cada rodada: a chuva faz mais lama, a tempestade levanta dunas, raios caem */
+function weatherTick(){
+  if(S.weather==='rain'){ if(Math.random()<.55) addTerrain('mud'); if(Math.random()<.1) lightning(); }
+  if(S.weather==='sand'){ if(Math.random()<.4) addTerrain('drift'); }
+}
+function lightning(){ S.flash=5; sfx('thunder'); shake(1); log(t('logLightning'),'l-sys'); }
+
+/* ---------- Peso nos golpes ---------- */
+function shake(n){
+  n = clamp(n,1,3); const b = $('arenaBox');
+  ['shake1','shake2','shake3'].forEach(c => b.classList.remove(c)); void b.offsetWidth;
+  b.classList.add('shake'+n); setTimeout(()=>b.classList.remove('shake'+n),400);
+}
+function freeze(ms){ const b=$('arenaBox'); b.classList.add('freeze'); setTimeout(()=>b.classList.remove('freeze'),ms); }   // micro-pausa no impacto
+function zoomPulse(){ const b=$('arenaBox'); b.classList.remove('zoom'); void b.offsetWidth; b.classList.add('zoom'); setTimeout(()=>b.classList.remove('zoom'),300); }
+function knock(f){ f.el.classList.add('knock'); setTimeout(()=>f.el.classList.remove('knock'),300); }
+function particles(f,cls,n,spread,bg){
+  const cell = cellOf(f); if(!cell) return;
+  for(let i=0;i<n;i++){
+    const p = document.createElement('div'); p.className = 'pt '+cls;
+    const a = Math.random()*Math.PI*2, d = (spread||26)*(.4+Math.random()*.9);
+    p.style.setProperty('--dx',Math.round(Math.cos(a)*d)+'px'); p.style.setProperty('--dy',Math.round(Math.sin(a)*d-6)+'px');
+    if(bg) p.style.background = bg;
+    cell.appendChild(p); setTimeout(()=>p.remove(),950);
+  }
+}
+/* Manchas de sangue que ficam na areia durante a luta */
+function stainAt(f,k){
+  const cell = cellOf(f); if(!cell) return;
+  cell._st = cell._st || [];
+  for(let i=0;i<k;i++){
+    const s = document.createElement('div'); s.className = 'stain';
+    const w = 18+Math.random()*30;
+    s.style.width = w+'%'; s.style.height = (w*.7)+'%'; s.style.left = (Math.random()*60)+'%'; s.style.top = (30+Math.random()*50)+'%';
+    s.style.transform = 'rotate('+Math.round(Math.random()*180)+'deg)';
+    cell.appendChild(s); cell._st.push(s);
+    if(cell._st.length>7) cell._st.shift().remove();
+  }
+}
+function clearStains(){ cells.forEach(c => { if(c._st){ c._st.forEach(s => s.remove()); c._st=[]; } }); }
+function fxBlood(f,n){ particles(f,'blood',n,34); stainAt(f,Math.ceil(n/5)); if(n>=8) sfx('blood'); }
+function fxLimb(d,k){
+  particles(d,'limb',1,40,d.isP ? LOOK.skin : '#c28a5a');
+  fxBlood(d,14); shake(2); setTimeout(()=>sfx('gasp'),150); S.excite = Math.min(1,S.excite+.5);
+}
+/* Chamado em todo dano: tremor, micro-pausa, recuo, faíscas e sangue conforme a força do golpe */
+function fxHit(f,amt,o){
+  if(o.status){ particles(f,o.type==='fire' ? 'ember' : 'blood',2,18); return; }
+  const power = o.crit ? 3 : (amt>=22 ? 2 : (amt>=12 ? 1 : 0));
+  S.excite = Math.min(1, S.excite + .1 + power*.1);
+  if(power>=1) knock(f);
+  if(power>=2){ shake(power); freeze(power===3 ? 140 : 90); }
+  if(power===3){ zoomPulse(); setTimeout(()=>sfx('gasp'),120); }
+  if(o.type==='fire') particles(f,'ember',power+4,28);
+  else if(o.melee && f.def) particles(f,'spark',7,30);
+  else fxBlood(f, power===3 ? 10 : (power===2 ? 6 : 3));
+}
+
+/* ---------- Plateia ---------- */
+let STANDS = null;
+function initStands(){
+  const n = 46, sk=['#f3d2b3','#e0b08a','#d9a066','#b87c46','#8d5a32'], cl=['#8B1A1A','#2b4a8c','#2f6b3a','#c9a227','#E8DCC6','#a0522d','#5C5C5C','#7a5230'], hr=['#2c1e13','#5a3a1c','#a0522d','#d9b36a','#e8e0d0'];
+  STANDS = [];
+  for(let i=0;i<n;i++) STANDS.push({ x:(i+.5)/n, row:i%2, sk:sk[rnd(0,4)], cl:cl[rnd(0,7)], hr:hr[rnd(0,4)], ph:Math.random()*6.28 });
+  STANDS.sort((a,b)=>a.row-b.row);
+}
+function drawStands(tm){
+  const cv = $('stands'); if(!cv || !cv.getContext) return;
+  const g = cv.getContext('2d'); if(!g || !g.clearRect) return;
+  const W = cv.clientWidth; if(!W) return;
+  if(cv.width!==W) cv.width = W; if(cv.height!==46) cv.height = 46;
+  g.clearRect(0,0,W,46);
+  g.fillStyle='#2b1d12'; g.fillRect(0,0,W,46); g.fillStyle='#35241a'; g.fillRect(0,20,W,26);
+  const p = Math.max(2, Math.round(W/230)), mood = S.favor>=60 ? 1 : (S.favor<=40 ? -1 : 0), ex = S.excite;
+  STANDS.forEach((s,i)=>{
+    const baseY = s.row ? 27 : 12;
+    const bob = Math.abs(Math.sin(tm/150+s.ph)) * (ex*2.4 + (mood>0 ? .9 : 0)) * p*.55;
+    const x = Math.round(s.x*W - 2.5*p), y = Math.round(baseY - bob);
+    g.fillStyle=s.cl; g.fillRect(x,y+3*p,5*p,4*p);
+    g.fillStyle=s.sk; g.fillRect(x+p,y,3*p,3*p);
+    g.fillStyle=s.hr; g.fillRect(x+p,y,3*p,p);
+    const up = ex>.35 || (mood>0 && Math.sin(tm/300+s.ph)>.2) || (S.thrower===i && tm-S.throwT<500);
+    g.fillStyle=s.sk;
+    if(up){ g.fillRect(x-p,y-2*p,p,4*p); g.fillRect(x+5*p,y-2*p,p,4*p); }
+    else  { g.fillRect(x-p,y+3*p,p,3*p); g.fillRect(x+5*p,y+3*p,p,3*p); }
+    if(mood<0){ g.fillStyle='#1a0f08'; g.fillRect(x+p,y+p,3*p,p); }          // sobrancelhas furiosas
+  });
+  g.fillStyle='#8B5A2B'; g.fillRect(0,40,W,6); g.fillStyle='#5c3a1c'; g.fillRect(0,44,W,2);
+}
+/* A plateia atira pedra, pão ou poção na direção do alvo */
+function throwFromStands(kind,target){
+  const box = $('arenaBox'); if(!box) return;
+  const p = document.createElement('div'); p.className = 'proj '+kind;
+  p.style.left = (20+Math.random()*60)+'%'; p.style.top = '-12%';
+  box.appendChild(p);
+  S.thrower = STANDS ? rnd(0,STANDS.length-1) : 0; S.throwT = Date.now(); sfx('throwSfx');
+  void p.offsetWidth;
+  p.style.left = ((target.c+.5)/COLS*100)+'%'; p.style.top = ((target.r+.5)/ROWS*100)+'%';
+  setTimeout(()=>p.remove(),520);
+}
+function crowdCheer(){ S.excite = Math.min(1,S.excite+.5); sfx('cheer'); }
+
+/* ---------- Veredito: poupar ou executar o inimigo derrotado ---------- */
+function showVerdict(){
+  S.wish = S.favor>=50 ? 'mercy' : 'blood';
+  $('modal').innerHTML = `<div class="card mbox">
+    <div class="title" style="font-size:26px">${t('verdictTitle')}</div>
+    <div class="thumb">${S.wish==='mercy' ? '👍' : '👎'}</div>
+    <p>${t('verdictCrowd',{p:S.favor,e:S.enemy.name})}</p>
+    <p><b>${t(S.wish==='mercy' ? 'verdictMercyWish' : 'verdictBloodWish')}</b></p>
+    <div class="blessRow"><button class="btn ghost" onclick="verdict('spare')">${t('spare')}</button><button class="btn" onclick="verdict('kill')">${t('execute')}</button></div></div>`;
+  $('modal').classList.add('on'); sfx('verdict');
+}
+function verdict(choice){
+  const p=S.player, e=S.enemy, run=S.run;
+  $('modal').classList.remove('on');
+  const follow = (choice==='spare') === (S.wish==='mercy');
+  onVerdict(choice);
+  if(choice==='kill'){
+    e.el.classList.remove('down'); e.el.classList.add('dead'); fxBlood(e,12); shake(2);
+    log(t('logExecute',{p:p.name,e:e.name}),'l-crit');
+  }else{
+    e.el.classList.remove('down');
+    log(t('logSpare',{p:p.name,e:e.name}),'l-hit');
+  }
+  if(follow){
+    S.nextFavor = 12; crowdCheer(); log(t('verdictFollow'),'l-crowd');
+  }else{
+    S.nextFavor = -12; sfx('boo'); S.excite = Math.min(1,S.excite+.4);
+    const ks = ATTR_KEYS.filter(k => p.base[k]<10);
+    if(ks.length){ const k=ks[rnd(0,ks.length-1)]; p.base[k]++; applyStats(p,false); log(t('verdictDefy',{a:t('attr_'+k)}),'l-crowd'); }
+  }
+  render();
+  setTimeout(()=>{ if(run!==S.run) return; showBless(); },1100);
+}
+
+/* ---------- Camadas visuais: chuva, tempestade de areia, relâmpago, plateia ---------- */
+let RAIN = [], DUST = [];
+function drawWeather(){
+  const cv = $('fxCv'); if(!cv || !cv.getContext) return;
+  const g = cv.getContext('2d'); if(!g || !g.clearRect) return;
+  const W = cv.clientWidth, H = cv.clientHeight; if(!W || !H) return;
+  if(cv.width!==W) cv.width = W; if(cv.height!==H) cv.height = H;
+  g.clearRect(0,0,W,H);
+  if(S.weather==='rain'){
+    if(!RAIN.length) for(let i=0;i<120;i++) RAIN.push({ x:Math.random(), y:Math.random(), v:.05+Math.random()*.05 });
+    g.fillStyle='rgba(30,40,60,.16)'; g.fillRect(0,0,W,H);
+    g.strokeStyle='rgba(205,220,240,.6)'; g.lineWidth=1; g.beginPath();
+    RAIN.forEach(d=>{ const x=d.x*W, y=d.y*H; g.moveTo(x,y); g.lineTo(x-3,y+11); d.y+=d.v; d.x-=.004; if(d.y>1){ d.y=-.05; d.x=Math.random()*1.1; } });
+    g.stroke();
+  }
+  if(S.weather==='sand'){
+    if(!DUST.length) for(let i=0;i<90;i++) DUST.push({ x:Math.random(), y:Math.random(), v:.015+Math.random()*.03, s:1+Math.random()*2 });
+    g.fillStyle='rgba(214,170,100,.24)'; g.fillRect(0,0,W,H);
+    g.fillStyle='rgba(240,212,160,.7)';
+    DUST.forEach(d=>{ g.fillRect(d.x*W, d.y*H, 6*d.s, d.s); d.x+=d.v; if(d.x>1.05){ d.x=-.05; d.y=Math.random(); } });
+  }
+  if(S.flash>0){ g.fillStyle='rgba(255,255,255,'+(S.flash*.14)+')'; g.fillRect(0,0,W,H); S.flash--; }
+}
+function fxLoop(){
+  S.excite = Math.max(0, S.excite-.012);
+  if(S.screen==='sBattle' && S.active && S.favor>=100) unlockAch('crowd');
+  if(S.screen==='sBattle'){ drawStands(Date.now()); drawWeather(); }
+  ambTick();
+}
+function fxInit(){ initStands(); setInterval(fxLoop,80); }
+
+/* =====================================================================
+   7. LINHAGEM, IDIOMA E ESTADO GLOBAL
+   ===================================================================== */
+const SAVE_KEY = 'gladiators_arena_lineage_v1', LANG_KEY = 'gladiators_arena_lang_v1';
+let LIN = { scars:[], gen:1, best:0, wins:0 };
+function loadLin(){
+  try{
+    const j = JSON.parse(localStorage.getItem(SAVE_KEY));
+    if(j && Array.isArray(j.scars)) LIN = Object.assign(LIN, j);
+    LIN.scars = LIN.scars.filter(k => SCARS[k]).slice(-maxScars());
+  }catch(e){}
+}
+function saveLin(){ try{ localStorage.setItem(SAVE_KEY, JSON.stringify(LIN)); }catch(e){} }
+function resetLin(){
+  if(!confirm(t('confirmReset'))) return;
+  LIN = { scars:[], gen:1, best:0, wins:0 }; saveLin(); renderStart();
+}
+function detectLang(){
+  try{ const s = localStorage.getItem(LANG_KEY); if(s && I18N[s]) return s; }catch(e){}
+  const n = ((typeof navigator!=='undefined' && navigator.language) || 'pt').slice(0,2).toLowerCase();
+  return I18N[n] ? n : 'pt';
+}
+const S = {
+  player:null, enemy:null, champ:0, turn:0,
+  fireFront:COLS,          // colunas >= fireFront estão em chamas (COLS = sem fogo)
+  pillars:[], favor:50,
+  busy:false, active:false, over:false, moveMode:false,
+  run:0,                   // muda ao sair da luta: cancela temporizadores pendentes
+  screen:'sStart',
+  nextFavor:0, weather:'clear', terrain:{}, excite:0, flash:0, thrower:-1, throwT:0, wish:'mercy', mode:'campaign', total:8, kills:0, dailyMod:null, dailySeq:[], dailyKey:''
+};
+let cells = [];
+let ATTR = { pow:1, agi:1, vit:1, cha:1, end:1 };
+
+function show(id){
+  S.screen = id;
+  document.querySelectorAll('.screen').forEach(s => s.classList.toggle('on', s.id===id));
+  AUD.want = (id==='sStart' || id==='sCreate' || id==='sLegacy');      // música só nos menus
+  musicSync(); ambTick();
+}
+
+/* ---------- Idioma ---------- */
+const FLAGS = {
+  pt:'<svg viewBox="0 0 30 20"><rect width="30" height="20" fill="#009b3a"/><polygon points="15,2.2 27.5,10 15,17.8 2.5,10" fill="#ffdf00"/><circle cx="15" cy="10" r="4.3" fill="#002776"/><path d="M10.9 9.2Q15 7.8 19.1 10.8" stroke="#fff" stroke-width=".9" fill="none"/></svg>',
+  en:'<svg viewBox="0 0 30 20"><rect width="30" height="20" fill="#fff"/><g fill="#b22234"><rect y="0" width="30" height="1.54"/><rect y="3.08" width="30" height="1.54"/><rect y="6.15" width="30" height="1.54"/><rect y="9.23" width="30" height="1.54"/><rect y="12.3" width="30" height="1.54"/><rect y="15.4" width="30" height="1.54"/><rect y="18.46" width="30" height="1.54"/></g><rect width="12.5" height="10.8" fill="#3c3b6e"/><g fill="#fff"><circle cx="2" cy="2" r=".6"/><circle cx="5" cy="2" r=".6"/><circle cx="8" cy="2" r=".6"/><circle cx="10.6" cy="2" r=".6"/><circle cx="3.5" cy="4.6" r=".6"/><circle cx="6.5" cy="4.6" r=".6"/><circle cx="9.3" cy="4.6" r=".6"/><circle cx="2" cy="7.2" r=".6"/><circle cx="5" cy="7.2" r=".6"/><circle cx="8" cy="7.2" r=".6"/><circle cx="10.6" cy="7.2" r=".6"/><circle cx="3.5" cy="9.6" r=".6"/><circle cx="6.5" cy="9.6" r=".6"/><circle cx="9.3" cy="9.6" r=".6"/></g></svg>',
+  es:'<svg viewBox="0 0 30 20"><rect width="30" height="20" fill="#aa151b"/><rect y="5" width="30" height="10" fill="#f1bf00"/><rect x="6" y="7.6" width="3.2" height="4.8" fill="#aa151b" opacity=".85"/></svg>'
+};
+const FLAG_NAMES = { pt:'Português', en:'English', es:'Español' };
+function renderFlags(){
+  $('flags').innerHTML = ['pt','en','es'].map(l =>
+    `<button class="flag${l===LANG?' on':''}" onclick="setLang('${l}')" title="${FLAG_NAMES[l]}" aria-label="${FLAG_NAMES[l]}">${FLAGS[l]}</button>`).join('');
+}
+function setLang(l){
+  if(!I18N[l]) return;
+  LANG = l; try{ localStorage.setItem(LANG_KEY,l); }catch(e){}
+  applyLang();
+}
+function applyLang(){
+  if(document.documentElement) document.documentElement.lang = ({pt:'pt-BR',en:'en',es:'es'})[LANG];
+  document.querySelectorAll('[data-i18n]').forEach(e => { e.textContent = t(e.dataset.i18n); });
+  document.querySelectorAll('[data-i18n-ph]').forEach(e => { e.placeholder = t(e.dataset.i18nPh); });
+  const ni = $('nameIn');
+  if(ni && ['Gladiador','Gladiator'].indexOf(ni.value)>=0) ni.value = t('defName');
+  renderFlags(); renderStart(); renderMute(); renderLegBtn();
+  if(S.screen==='sCreate'){ renderCreate(); renderLook(); renderModes(); }
+  if(S.screen==='sLegacy') renderLegacy();
+  if(S.screen==='sBattle' && S.player){ buildActions(); render(); }
+}
+const champName = ch => t('name_'+ch.id);
+
+/* =====================================================================
+   8. TELA INICIAL
+   ===================================================================== */
+function renderStart(){
+  $('heroRow').innerHTML =
+    [['player','heroYou'],['thrax','hero_thrax'],['lysandra','hero_lysandra'],['aldric','hero_aldric'],['zahra','hero_zahra'],['pillar','hero_pillar'],['gorm','hero_gorm'],['nyx','hero_nyx'],['antares','hero_antares']]
+    .map(h => `<div class="hero"><img src="${spriteUrl(h[0])}" alt=""><small>${t(h[1])}</small></div>`).join('');
+  $('startLin').innerHTML = t('lineage',{g:LIN.gen,n:LIN.scars.length,m:maxScars()})
+    + (LIN.wins ? t('linWins',{w:LIN.wins}) : '')
+    + (LIN.scars.length || LIN.gen>1 ? ` · <a onclick="resetLin()">${t('linReset')}</a>` : '');
+}
+function toMenu(){ show('sStart'); renderStart(); renderLegBtn(); }
+function leaveToStart(){
+  if(S.active && !confirm(t('confirmLeave'))) return;
+  S.run++; S.active=false; S.over=true; S.busy=true;
+  $('modal').classList.remove('on');
+  toMenu();
+}
+
+/* =====================================================================
+   9. CRIAÇÃO DE PERSONAGEM (atributos + aparência)
+   ===================================================================== */
+function pointsLeft(){ return pool() - (Object.values(ATTR).reduce((a,b)=>a+b,0) - 5); }
+function adj(k,d){
+  if(d>0){ if(pointsLeft()<=0 || ATTR[k]>=10) return; }
+  else if(ATTR[k]<=1) return;
+  ATTR[k]+=d; renderCreate();
+}
+function balanced(){
+  ATTR = { pow:1, agi:1, vit:1, cha:1, end:1 }; let l = pool();
+  for(let i=0;l>0 && i<500;i++){ const k = ATTR_KEYS[i%5]; if(ATTR[k]<10){ ATTR[k]++; l--; } }
+  renderCreate();
+}
+function resetAttr(){ ATTR = { pow:1, agi:1, vit:1, cha:1, end:1 }; renderCreate(); }
+function goCreate(){ ATTR = { pow:1, agi:1, vit:1, cha:1, end:1 }; $('createHint').textContent=''; show('sCreate'); renderCreate(); renderLook(); renderModes(); }
+
+/* Soma atributos base + modificadores de cicatrizes */
+function calcStats(a, scars){
+  const m = { pow:0, agi:0, vit:0, cha:0, hp:0, fireRes:0 };
+  scars.forEach(k => { const s = SCARS[k].mod; for(const x in s) m[x] += s[x]; });
+  return {
+    pow: Math.max(1, a.pow+m.pow), agi: Math.max(1, a.agi+m.agi),
+    vit: a.vit+m.vit, cha: a.cha+m.cha, end: a.end,
+    maxHp: Math.max(20, 40 + (a.vit+m.vit)*10 + m.hp + LEG.ranks.vit*6),
+    maxSta: 40 + a.end*6 + LEG.ranks.sta*5,
+    fireRes: Math.min(.6, m.fireRes)
+  };
+}
+function renderCreate(){
+  $('pts').textContent = pointsLeft(); $('ptsMax').textContent = pool();
+  $('attrList').innerHTML = ATTR_KEYS.map(k => `
+    <div class="attr"><div class="row"><b>${t('attr_'+k)}</b>
+      <div class="step"><button onclick="adj('${k}',-1)">−</button><span>${ATTR[k]}</span><button onclick="adj('${k}',1)">+</button></div>
+    </div><small>${t('attrd_'+k)}</small></div>`).join('');
+  const s = calcStats(ATTR, LIN.scars);
+  updatePreview();
+  $('prevStats').innerHTML =
+    `<li>${t('pvHp')}: <b>${s.maxHp}</b> · ${t('pvSta')}: <b>${s.maxSta}</b></li>`+
+    `<li>${t('attr_pow')}: <b>${s.pow}</b> · ${t('attr_agi')}: <b>${s.agi}</b></li>`+
+    `<li>${t('attr_cha')}: <b>${s.cha}</b> · ${t('pvCrowd')}: <b>${clamp(50+s.cha*2,0,100)}%</b></li>`+
+    `<li>${t('pvFire')}: <b>${Math.round(s.fireRes*100)}%</b></li>`;
+  $('scarBox').innerHTML = LIN.scars.length
+    ? LIN.scars.map(k => `<div class="scarItem"><b>${t('scar_'+k)}</b><em>${t('scard_'+k)}</em></div>`).join('')
+      + `<div class="scarItem" style="border:0">${t('scarCount',{n:LIN.scars.length,m:maxScars(),g:LIN.gen})}</div>`
+    : `<div class="scarItem" style="border:0">${t('noScars',{g:LIN.gen})}</div>`;
+}
+function updatePreview(){ $('prevImg').src = playerUrl(); }
+
+/* ---------- Aparência ---------- */
+function renderLook(){
+  const sw = k => SWATCH[k].map(c =>
+    `<button class="swb${LOOK[k].toLowerCase()===c.toLowerCase()?' on':''}" style="background:${c}" onclick="setLook('${k}','${c}',true)" aria-label="${c}"></button>`).join('');
+  $('lookBox').innerHTML =
+    LOOK_CATS.map(k => `<div class="lk"><span>${t('c_'+k)}</span>${sw(k)}<input type="color" value="${LOOK[k]}" oninput="setLook('${k}',this.value,false)"></div>`).join('')
+    + `<div class="lk"><span>${t('optHelmet')}</span><button class="tgl${LOOK.helmet?' on':''}" onclick="toggleLook('helmet')">${LOOK.helmet?t('yes'):t('no')}</button>`
+    + `<span style="margin-left:8px;min-width:0">${t('optLong')}</span><button class="tgl${LOOK.long?' on':''}" onclick="toggleLook('long')">${LOOK.long?t('yes'):t('no')}</button></div>`
+    + `<div class="lk"><button class="btn ghost" style="padding:6px 10px;font-size:10px" onclick="randomLook()">${t('randomLook')}</button>`
+    + `<button class="btn ghost" style="padding:6px 10px;font-size:10px" onclick="defaultLook()">${t('defaultLook')}</button></div>`;
+}
+function setLook(k,v,rebuild){ LOOK[k]=v; saveLook(); updatePreview(); if(rebuild) renderLook(); }
+function toggleLook(k){ LOOK[k]=!LOOK[k]; saveLook(); updatePreview(); renderLook(); }
+function randomLook(){
+  LOOK_CATS.forEach(k => { LOOK[k] = SWATCH[k][rnd(0,SWATCH[k].length-1)]; });
+  LOOK.helmet = Math.random()<.6; LOOK.long = Math.random()<.4;
+  saveLook(); updatePreview(); renderLook();
+}
+function defaultLook(){ LOOK = Object.assign({}, DEF_LOOK); saveLook(); updatePreview(); renderLook(); }
+
+/* =====================================================================
+   10. FÁBRICA DE LUTADORES
+   ===================================================================== */
+function mkLimbs(){
+  const l = {};
+  for(const k in LIMB_MAX) l[k] = { hp:LIMB_MAX[k], max:LIMB_MAX[k], lost:false };
+  return l;
+}
+/* Sprite no mapa: imagem + mini barras de HP e stamina acima da cabeça */
+function mkSpr(url, flip){
+  const d = document.createElement('div'); d.className = 'spr' + (flip ? ' flip' : '');
+  const mv = document.createElement('div'); mv.className = 'mv';
+  const img = document.createElement('img'); img.src = url; img.alt = '';
+  mv.appendChild(img); d.appendChild(mv);
+  const mini = document.createElement('div'); mini.className = 'mini';
+  const hb = document.createElement('b'), hi = document.createElement('i'); hi.className='h'; hb.appendChild(hi);
+  const sb = document.createElement('b'), si = document.createElement('i'); si.className='s'; sb.appendChild(si);
+  mini.appendChild(hb); mini.appendChild(sb); d.appendChild(mini);
+  d._h = hi; d._s = si; d._img = img;
+  return d;
+}
+function applyStats(p, fill){
+  const s = calcStats(p.base, p.scars), old = p.maxHp || 0;
+  p.pow=s.pow; p.agi=s.agi; p.cha=s.cha; p.end=s.end;
+  p.maxHp=s.maxHp; p.maxSta=s.maxSta; p.fireRes=s.fireRes;
+  if(fill){ p.hp=p.maxHp; p.sta=p.maxSta; }
+  else p.hp = Math.min(p.maxHp, p.hp + Math.max(0, p.maxHp-old));
+}
+function mkPlayer(name){
+  const p = { isP:true, name, base:Object.assign({},ATTR), scars:LIN.scars.slice(), limbs:mkLimbs(), st:newSt(), evade:false, combo:0,
+              def:false, c:1, r:2, lastCause:'blade', sid:'player', look:Object.assign({},LOOK), el:mkSpr(playerUrl(),false) };
+  applyStats(p,true);
+  return p;
+}
+function mkEnemy(ch){
+  return { isP:false, name:champName(ch), title:t('title_'+ch.id), ai:ch.ai, pow:ch.pow, agi:ch.agi, cha:0, end:0,
+           st:newSt(), evade:false, combo:0, stunRes:ch.stunRes||0, dodge:ch.dodge||0, bleedOnHit:ch.bleedOnHit||0, counterOnGuard:!!ch.counterOnGuard, burnOnFire:ch.burnOnFire||0, moveBonus:ch.moveBonus||0,
+           hp:ch.hp, maxHp:ch.hp, sta:ch.sta, maxSta:ch.sta, fireRes:0, limbs:mkLimbs(),
+           def:false, c:8, r:3, sid:ch.id, el:mkSpr(spriteUrl(ch.id),true) };
+}
+/* Penalidades por membros perdidos */
+const armsLost = f => (f.limbs.armR.lost?1:0) + (f.limbs.armL.lost?1:0);
+const legsLost = f => (f.limbs.legR.lost?1:0) + (f.limbs.legL.lost?1:0);
+const dmgMult  = f => Math.pow(.6, armsLost(f));            // cada braço perdido: -40% de dano
+const moveRange = f => legsLost(f)>=2 ? 0 : (legsLost(f)===1 ? BASE_MOVE : ((f.agi>=6 ? FAST_MOVE : BASE_MOVE) + (f.moveBonus||0)));
+const moveCost  = (f,c,r) => (legsLost(f)===1 ? COST.move*2 : COST.move) + (c===undefined ? 0 : terrainCost(c,r));
+
+/* =====================================================================
+   11. ARENA
+   ===================================================================== */
+const isFire = c => c >= S.fireFront;
+const pillarAt = (c,r) => S.pillars.some(q => q.c===c && q.r===r);
+const cellOf = f => cells[f.r*COLS + f.c];
+const occupied = (c,r,except) => [S.player,S.enemy].some(f => f && f!==except && f.hp>0 && f.c===c && f.r===r);
+function canMoveTo(f,c,r){
+  if(!inB(c,r) || pillarAt(c,r) || occupied(c,r,f)) return false;
+  const d = Math.hypot(c-f.c, r-f.r);
+  return d>0 && d<=moveRange(f)+.001;
+}
+function buildArena(){
+  const a = $('arena'); a.innerHTML=''; cells=[];
+  for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++){
+    const d = document.createElement('div');
+    d.className = 'cell' + ((c+r)%2 ? ' alt' : '');
+    d.onclick = () => onCell(c,r);
+    a.appendChild(d); cells.push(d);
+  }
+}
+/* Dia/noite: tinge a arena e mostra um aviso ao começar cada combate */
+function setTod(i){
+  const d = TOD[i % TOD.length];
+  $('tod').style.backgroundColor = d.c;
+  $('arenaCol').className = 'arenaCol tod-'+d.id;
+  const b = $('todBanner'); b.textContent = d.ic+' '+t('tod_'+d.id);
+  b.classList.remove('show'); void b.offsetWidth; b.classList.add('show');
+  log(t('todLog_'+d.id),'l-sys');
+}
+
+/* =====================================================================
+   12. LOG E EFEITOS VISUAIS
+   ===================================================================== */
+function log(txt,c=''){
+  const L = $('log'), d = document.createElement('div');
+  d.className = 'l '+c; d.textContent = txt; L.appendChild(d);
+  while(L.children.length>120) L.firstChild.remove();
+  L.scrollTop = L.scrollHeight;
+}
+function floatText(f,text,cls){
+  const cell = cellOf(f); if(!cell) return;
+  const d = document.createElement('div'); d.className='float '+cls; d.textContent=text;
+  cell.appendChild(d); setTimeout(()=>d.remove(),1100);
+}
+function flashHit(f){ f.el.classList.add('hit'); setTimeout(()=>f.el.classList.remove('hit'),420); }
+function lunge(f){ f.el.classList.add('lunge'); setTimeout(()=>f.el.classList.remove('lunge'),300); }
+function burst(f){ const c=cellOf(f); c.classList.add('burst'); setTimeout(()=>c.classList.remove('burst'),520); }
+
+/* =====================================================================
+   13. DANO, MEMBROS E CURA
+   ===================================================================== */
+function dealDamage(f, amt, o){
+  if(o.type==='fire') amt *= (1 - (f.fireRes||0));
+  if(o.melee && f.def) amt *= .5;                      // DEFENDER: -50% dano corpo a corpo
+  amt = Math.max(1, Math.round(amt));
+  f.hp = Math.max(0, f.hp - amt);
+  if(f.isP) f.lastCause = o.type;                      // causa da última ferida (define a cicatriz)
+  flashHit(f);
+  floatText(f, '-'+amt, (o.type==='fire' ? 'fire' : (o.crit ? 'crit' : 'dmg')) + (amt>=22 ? ' big' : ''));
+  fxHit(f, amt, o);
+  return amt;
+}
+function heal(f,n){
+  const real = Math.min(f.maxHp - f.hp, n); f.hp += real;
+  if(real>0) floatText(f,'+'+real,'heal');
+  return real;
+}
+function limbHit(d, n){
+  const alive = Object.keys(d.limbs).filter(k => !d.limbs[k].lost);
+  if(!alive.length) return;
+  const k = alive[rnd(0,alive.length-1)], L = d.limbs[k], ln = t('limb_'+k);
+  if(Math.random() < DISMEMBER_CHANCE){
+    L.lost = true; L.hp = 0;
+    log(t('logLimbLost',{d:d.name,limb:ln}),'l-crit'); floatText(d,t('dismemberFloat'),'crit'); sfx('dismember'); fxLimb(d,k);
+  }else{
+    sfx('crack');
+    L.hp = Math.max(0, L.hp - Math.round(n*.5));
+    if(L.hp<=0){ L.lost = true; log(t('logLimbBroke',{d:d.name,limb:ln}),'l-crit'); fxLimb(d,k); }
+    else log(t('logLimbHurt',{d:d.name,limb:ln,hp:L.hp,max:L.max}));
+  }
+}
+function fireHit(f){
+  const n = dealDamage(f, FIRE_DMG*fireMult(), { type:'fire', env:true }); sfx('sizzle');
+  log(t('logBurn',{f:f.name,n}),'l-fire');
+  if(f.hp>0 && Math.random()<.3) addStatus(f,'burn',2);
+}
+
+/* =====================================================================
+   14. AÇÕES DE COMBATE (compartilhadas por jogador e inimigos)
+   ===================================================================== */
+function rest(f){
+  sfx('rest');
+  f.sta = Math.min(f.maxSta, f.sta + 20 + f.end*2 + (f.isP?0:6));
+  heal(f,3);
+  log(t('logRest',{a:f.name}));
+}
+function moveFighter(f,c,r){
+  f.c=c; f.r=r; sfx(terrainAt(c,r)==='mud' ? 'splash' : 'step');
+  if(isFire(c)) fireHit(f);
+}
+
+/* =====================================================================
+   15. BATALHA: INÍCIO, RENDER, TURNOS
+   ===================================================================== */
+function startRun(){
+  if(pointsLeft()!==0){ $('createHint').textContent=t('needPoints'); return; }
+  const name = ($('nameIn').value || t('defName')).trim().slice(0,16) || t('defName');
+  S.run++; S.nextFavor = 0; startMode();
+  S.player = mkPlayer(name);
+  show('sBattle');
+  if(!cells.length) buildArena();
+  buildActions();
+  S.active = true;
+  startFight(0);
+}
+function startFight(i){
+  const p = S.player, ch = cfgFor(i);
+  if(S.enemy && S.enemy.el.parentNode) S.enemy.el.remove();
+  S.champ=i; S.turn=0; S.fireFront=COLS; S.pillars=[]; S.moveMode=false; S.busy=false; S.over=false;
+  p.c=1; p.r=2; p.def=false; p.sta=p.maxSta; p.limbs=mkLimbs(); p.el.classList.remove('dead'); p.st=newSt(); p.evade=false; p.combo=0;
+  S.favor = clamp(50 + p.cha*2 + LEG.ranks.fav*4 + S.nextFavor, 0, 100); S.nextFavor = 0;
+  S.enemy = mkEnemy(ch);
+  $('modal').classList.remove('on');
+  $('log').innerHTML='';
+  log(t('logFight',{n:i+1,m:totalLabel(),name:champName(ch),title:t('title_'+ch.id)}),'l-sys'); sfx('gong');
+  log(t('logHint'),'l-sys');
+  setTod(i); setWeather(i); clearStains(); S.excite = .25;
+  render();
+}
+function bar(cls,v,m,txt){
+  return `<div class="bar ${cls}"><i style="width:${clamp(v/m*100,0,100)}%"></i><span>${txt!==undefined?txt:v+'/'+m}</span></div>`;
+}
+function limbRows(f){
+  return Object.keys(f.limbs).map(k => {
+    const L=f.limbs[k];
+    return `<div class="limb"><span>${t('limb_'+k)}</span><b class="${L.lost?'lost':'ok'}">${L.lost?t('limbLostTxt'):t('limbOk')+' '+L.hp+'/'+L.max}</b></div>`;
+  }).join('');
+}
+function renderSide(){
+  const p=S.player, e=S.enemy;
+  const sc = p.scars.length ? p.scars.map(k=>'• '+t('scar_'+k)).join('<br>') : t('none');
+  $('left').innerHTML = `
+    <div class="card">
+      <div class="nm">${p.name}${p.def?'<span class="badge">'+t('guard')+'</span>':''}</div>
+      <div class="gen">${legendTitle()} · ${t('genLine',{g:LIN.gen,r:Math.round(p.fireRes*100)})}</div>${statusHtml(p)}
+      <div class="lbl"><span>${t('life')}</span></div>${bar('hp',p.hp,p.maxHp)}
+      <div class="lbl"><span>${t('sta')}</span></div>${bar('sta',p.sta,p.maxSta)}
+      <div class="lbl"><span>${t('crowd')}</span></div>${bar('fav',S.favor,100,S.favor+'%')}
+      <div class="stats"><div>${t('ab_pow')}<b>${p.pow}</b></div><div>${t('ab_agi')}<b>${p.agi}</b></div><div>${t('ab_vit')}<b>${p.base.vit}</b></div><div>${t('ab_cha')}<b>${p.cha}</b></div><div>${t('ab_end')}<b>${p.end}</b></div></div>
+    </div>
+    <div class="card"><h4>${t('limbs')}</h4>${limbRows(p)}</div>
+    <div class="card">
+      <h4>${e.name}${e.def?'<span class="badge">'+t('guard')+'</span>':''}</h4>
+      <div class="gen">${e.title} · ${t('level',{n:S.champ+1})}</div>${statusHtml(e)}
+      <div class="lbl"><span>${t('life')}</span></div>${bar('hp',e.hp,e.maxHp)}
+      <div class="lbl"><span>${t('sta')}</span></div>${bar('sta',e.sta,e.maxSta)}
+      <div style="margin-top:6px">${limbRows(e)}</div>
+    </div>
+    <div class="card"><h4>${t('scarsTitle')}</h4><div class="miniScars">${sc}</div></div>`;
+}
+function render(){
+  const p=S.player, e=S.enemy, can = guard();
+  // células
+  cells.forEach((el,i)=>{
+    const c=i%COLS, r=(i/COLS)|0;
+    el.classList.toggle('fire', isFire(c));
+    const tn = terrainAt(c,r); el.classList.toggle('mud', tn==='mud'); el.classList.toggle('drift', tn==='drift');
+    const pil = S.pillars.find(q=>q.c===c&&q.r===r);
+    el.classList.toggle('pillar', !!pil);
+    let blk = el.querySelector('.blk');
+    if(pil && !blk){ blk=document.createElement('span'); blk.className='blk'+(pil.fresh?' new':''); blk.textContent='█'; el.appendChild(blk); pil.fresh=false; }
+    if(!pil && blk) blk.remove();
+    el.classList.toggle('occ', (p.c===c&&p.r===r) || (e.c===c&&e.r===r));   // sprites ficam sempre acima do mapa
+    el.classList.toggle('reach', can && S.moveMode && p.sta>=moveCost(p,c,r) && canMoveTo(p,c,r));
+    el.classList.toggle('tgt', can && e.hp>0 && e.c===c && e.r===r && dist(p,e)<=ATK_RANGE);
+  });
+  // sprites + mini barras
+  [p,e].forEach(f=>{
+    const cell=cellOf(f);
+    if(f.el.parentNode!==cell) cell.appendChild(f.el);
+    if(f.hp>0) f.el.classList.remove('dead');
+    f.el._h.style.width = clamp(f.hp/f.maxHp*100,0,100)+'%';
+    f.el._s.style.width = clamp(f.sta/f.maxSta*100,0,100)+'%';
+    refreshSprite(f);
+  });
+  renderSide();
+  // topo
+  const td = TOD[S.champ % TOD.length];
+  const nf = S.fireFront<=FIRE_STOP_COL ? t('fireMax') : t('fireIn',{n:FIRE_EVERY - S.turn%FIRE_EVERY});
+  $('topInfo').textContent = [t('topFight',{n:S.champ+1,m:totalLabel()}), t('topTurn',{n:S.turn}), td.ic+' '+t('tod_'+td.id), wxIc(S.weather)+' '+t('wx_'+S.weather), nf, t('pillarIn',{n:PILLAR_EVERY - S.turn%PILLAR_EVERY})].join(' · ');
+  // botões
+  const set=(id,ok)=>{ const b=$(id); if(b) b.disabled=!ok; };
+  set('a_mv', can && p.sta>=moveCost(p) && moveRange(p)>0);
+  set('a_at', can && p.sta>=COST.attack);
+  set('a_df', can && p.sta>=COST.defend);
+  set('a_rs', can);
+  set('a_mg', can && p.sta>=COST.magic);
+  set('a_tn', can && p.sta>=COST.taunt);
+  set('a_hv', can && p.sta>=COST.heavy);
+  set('a_qk', can && p.sta>=COST.quick);
+  set('a_dg', can && p.sta>=COST.dodge);
+  $('a_mv').classList.toggle('on', S.moveMode);
+}
+function guard(){ return S.active && !S.busy && !S.over && S.player.hp>0 && S.enemy.hp>0; }
+
+/* ---------- Barra de ações ---------- */
+function buildActions(){
+  const A = [
+    ['a_mv',t('act_mv'),t('costSta',{n:COST.move}),toggleMove],
+    ['a_at',t('act_at'),t('costSta',{n:COST.attack}),doAttack],
+    ['a_hv',t('act_hv'),t('costSta',{n:COST.heavy}),doHeavy],
+    ['a_qk',t('act_qk'),t('costSta',{n:COST.quick}),doQuick],
+    ['a_df',t('act_df'),t('costSta',{n:COST.defend}),doDefend],
+    ['a_dg',t('act_dg'),t('costSta',{n:COST.dodge}),doDodge],
+    ['a_rs',t('act_rs'),t('restInfo'),doRest],
+    ['a_mg',t('act_mg'),t('costSta',{n:COST.magic}),doMagic],
+    ['a_tn',t('act_tn'),t('costSta',{n:COST.taunt}),doTaunt]
+  ];
+  const box=$('actions'); box.innerHTML='';
+  A.forEach(a=>{
+    const b=document.createElement('button'); b.className='abtn'; b.id=a[0];
+    b.innerHTML=`${a[1]}<small>${a[2]}</small>`; b.onclick=a[3]; box.appendChild(b);
+  });
+}
+
+/* ---------- Ações do jogador ---------- */
+function toggleMove(){
+  if(!guard()) return;
+  S.moveMode = !S.moveMode;
+  if(S.moveMode) log(t('msgMoveHint'),'l-sys');
+  render();
+}
+function onCell(c,r){
+  if(!guard()) return;
+  const p=S.player, e=S.enemy;
+  if(e.c===c && e.r===r){ if(dist(p,e)<=ATK_RANGE) doAttack(); else log(t('msgFarEnemy'),'l-sys'); return; }
+  if(pillarAt(c,r)){ log(t('msgPillar'),'l-sys'); return; }
+  if(moveRange(p)<=0){ log(t('msgNoLegs'),'l-sys'); return; }
+  if(!canMoveTo(p,c,r)){ log(t('msgOutRange'),'l-sys'); return; }
+  if(p.sta<moveCost(p,c,r)){ log(t('msgNoSta'),'l-sys'); return; }
+  p.sta -= moveCost(p,c,r);
+  moveFighter(p,c,r);
+  log(t('logMove',{p:p.name,c:c+1,r:r+1}));
+  endPlayerTurn();
+}
+function doAttack(){
+  if(!guard()) return;
+  const p=S.player,e=S.enemy;
+  if(p.sta<COST.attack) return;
+  if(dist(p,e)>ATK_RANGE){ log(t('msgTargetFar'),'l-sys'); return; }
+  melee(p,e); endPlayerTurn();
+}
+function doDefend(){
+  if(!guard()) return;
+  const p=S.player; if(p.sta<COST.defend) return;
+  p.sta-=COST.defend; p.def=true; sfx('defend');
+  log(t('logDefend',{p:p.name}));
+  endPlayerTurn();
+}
+function doRest(){ if(!guard()) return; rest(S.player); endPlayerTurn(); }
+function doMagic(){
+  if(!guard()) return;
+  const p=S.player,e=S.enemy; if(p.sta<COST.magic) return;
+  if(dist(p,e)>magicRange()){ log(t('msgMagicFar'),'l-sys'); return; }
+  castFire(p,e); endPlayerTurn();
+}
+function doTaunt(){
+  if(!guard()) return;
+  const p=S.player; if(p.sta<COST.taunt) return;
+  p.sta-=COST.taunt;
+  const gain = 8 + p.cha;
+  S.favor = clamp(S.favor+gain,0,100);
+  log(t('logTaunt',{p:p.name,g:gain}),'l-crowd'); sfx('taunt');
+  if(Math.random()<.6){
+    const h=rnd(10,25); heal(p,h); setTimeout(()=>sfx('heal'),450);
+    throwFromStands(Math.random()<.5 ? 'bread' : 'potion', p); crowdCheer();
+    log(t('logBread',{h}),'l-heal');
+  }else{ log(t('logBoo'),'l-crowd'); setTimeout(()=>sfx('boo'),450); S.excite = Math.min(1,S.excite+.3); }
+  endPlayerTurn();
+}
+
+/* ---------- Fluxo de turno (cancelável pelo token S.run) ---------- */
+function checkEnd(){
+  if(S.over) return true;
+  if(S.player.hp<=0){ defeat(); return true; }
+  if(S.enemy.hp<=0){ victory(); return true; }
+  return false;
+}
+function endPlayerTurn(){
+  const run = S.run;
+  S.moveMode=false; render();
+  if(checkEnd()) return;
+  S.busy=true; render();
+  setTimeout(()=>{
+    if(run!==S.run) return;
+    enemyTurn(); render();
+    if(checkEnd()) return;
+    setTimeout(()=>{
+      if(run!==S.run) return;
+      roundEnd(); render();
+      if(checkEnd()) return;
+      startPlayerTurn();
+    },550);
+  },650);
+}
+
+/* =====================================================================
+   16. EVENTOS DA ARENA VIVA E PLATEIA (fim de cada rodada)
+   ===================================================================== */
+function roundEnd(){
+  S.player.def=false; S.player.evade=false;
+  S.turn++; weatherTick(); statusTick();
+  if(S.turn % FIRE_EVERY===0)   advanceFire();
+  if(S.turn % PILLAR_EVERY===0) dropPillar();
+  if(Math.random() < CROWD_STONE_CHANCE) crowdStone();
+}
+/* Fogo avança da direita: coluna 10, 9, 8... até a 5 */
+function advanceFire(){
+  if(S.fireFront<=FIRE_STOP_COL){ log(t('logFireMax'),'l-fire'); return; }
+  S.fireFront = (S.fireFront===COLS) ? COLS-1 : S.fireFront-1;
+  log(t('logFireAdv',{c:S.fireFront+1}),'l-fire'); sfx('fireAdv'); shake(1);
+  [S.player,S.enemy].forEach(f=>{ if(f.hp>0 && f.c===S.fireFront) fireHit(f); });
+}
+/* Pilar cai em posição aleatória (colunas 3-9, fileiras 1-6) e bloqueia o caminho */
+function dropPillar(){
+  let c,r,k=0;
+  do{ c=rnd(2,8); r=rnd(0,5); k++; }while(pillarAt(c,r) && k<30);
+  S.pillars.push({c,r,fresh:true});
+  log(t('logPillar',{c:c+1,r:r+1}),'l-sys'); sfx('pillar'); shake(3); freeze(120);
+  [S.player,S.enemy].forEach(f=>{ if(f.hp>0 && f.c===c && f.r===r) pushOut(f); });
+}
+function pushOut(f){
+  const opts=[];
+  for(let dc=-1;dc<=1;dc++) for(let dr=-1;dr<=1;dr++){
+    if(!dc && !dr) continue;
+    const nc=f.c+dc, nr=f.r+dr;
+    if(inB(nc,nr) && !pillarAt(nc,nr) && !occupied(nc,nr,f)) opts.push([nc,nr]);
+  }
+  if(opts.length){
+    const o=opts[rnd(0,opts.length-1)]; f.c=o[0]; f.r=o[1];
+    log(t('logPush',{f:f.name}),'l-sys'); sfx('thud');
+    if(isFire(f.c)) fireHit(f);
+  }else{
+    const n=dealDamage(f,12,{type:'blade'});
+    log(t('logCrush',{f:f.name,n}),'l-dmg');
+  }
+}
+/* Plateia: favor <50 apedreja o jogador, >50 apedreja o inimigo */
+function crowdStone(){
+  let toP;
+  if(S.favor<50) toP=true; else if(S.favor>50) toP=false; else toP=Math.random()<.5;
+  const tg = toP ? S.player : S.enemy, n=rnd(5,13);
+  log(t('logStone',{fav:S.favor,t:tg.name}),'l-crowd');
+  sfx('stone'); throwFromStands('stone',tg);
+  dealDamage(tg,n,{type:'stone'});
+}
+
+/* =====================================================================
+   17. VITÓRIA, DERROTA E HERANÇA
+   ===================================================================== */
+function victory(){
+  if(S.over) return;
+  const run=S.run;
+  S.over=true; S.busy=true; S.enemy.el.classList.add('down'); S.kills++; onKill();
+  log(t('logVictory',{e:S.enemy.name}),'l-crit'); sfx('victory'); crowdCheer();
+  render();
+  setTimeout(()=>{ if(run!==S.run) return; S.champ>=S.total-1 ? showWin() : showVerdict(); },1500);
+}
+function showBless(){
+  const p=S.player;
+  const hf = .6 + .08*LEG.ranks.heal, h = Math.round(p.maxHp*hf); p.hp = Math.min(p.maxHp, p.hp+h);
+  $('modal').innerHTML = `<div class="card mbox">
+    <div class="title" style="font-size:28px">${t('blessTitle')}</div>
+    <p>${t('blessP1',{e:S.enemy.name,h:Math.round(hf*100)})}</p>
+    <p>${t('blessP2')}</p>
+    <div class="blessRow">${ATTR_KEYS.map(k=>`<button class="btn ghost" ${p.base[k]>=10?'disabled':''} onclick="bless('${k}')">${t('plusAttr',{a:t('attr_'+k)})}</button>`).join('')}</div>
+    <div class="blessRow"><button class="btn" onclick="bless(null)">${t('blessNone')}</button></div></div>`;
+  $('modal').classList.add('on');
+}
+function bless(k){
+  const p=S.player;
+  if(k){ p.base[k]=Math.min(10,p.base[k]+1); applyStats(p,false); sfx('bless'); }
+  startFight(S.champ+1);
+}
+function defeat(){
+  if(S.over) return;
+  const run=S.run;
+  S.over=true; S.busy=true; S.player.el.classList.add('dead');
+  log(t('logDefeat',{p:S.player.name}),'l-crit'); sfx('death'); fxBlood(S.player,12); shake(2);
+  render();
+  setTimeout(()=>{ if(run!==S.run) return; showDeath(); },1600);
+}
+function showDeath(){
+  const cause = S.player.lastCause in SCARS ? S.player.lastCause : 'blade';
+  LIN.scars.push(cause); LIN.scars = LIN.scars.slice(-maxScars());
+  LIN.best = Math.max(LIN.best, S.champ);
+  LIN.gen++; saveLin();
+  const gl = finishRun(false, cause);
+  $('deathBox').innerHTML = `
+    <div class="title deathRed">${t('deathTitle')}</div>
+    <p>${t('death_'+cause)}</p>
+    <p>${t('deathBy',{e:S.enemy.name,n:S.champ+1,m:totalLabel()})}</p>
+    <p><b>${t('gloryGain',{n:gl,t:LEG.glory})}</b></p>
+    <div class="card"><h4>${t('scarMade')}</h4>
+      <div class="scarItem" style="border:0"><b>${t('scar_'+cause)}</b><em>${t('scard_'+cause)}</em></div></div>
+    <div class="card"><h4>${t('scarsNext',{n:LIN.scars.length,m:maxScars()})}</h4>
+      ${LIN.scars.map(k=>`<div class="scarItem"><b>${t('scar_'+k)}</b><em>${t('scard_'+k)}</em></div>`).join('')}</div>
+    <button class="btn" onclick="goCreate()">${t('nextGlad',{g:LIN.gen})}</button>
+    <div style="height:12px"></div>
+    <button class="btn ghost" onclick="goLegacy()">${t('legacyBtn')} ★ ${LEG.glory}</button>
+    <div style="height:12px"></div>
+    <button class="btn ghost" onclick="toMenu()">${t('toMenu')}</button>`;
+  S.active=false; show('sDeath'); sfx('gameover');
+}
+function showWin(){
+  LIN.wins++; LIN.best=CHAMPS.length; LIN.gen++; saveLin(); sfx('win');
+  const gl = finishRun(true, 'win');
+  $('winBox').innerHTML = `
+    <div class="logo" style="font-size:clamp(34px,8vw,64px)">${t('win1')}<br>${t('win2')}</div>
+    <div class="sub" style="font-size:clamp(20px,4vw,32px)">${t('winSub')}</div>
+    <p>${t('winP1',{p:S.player.name})}</p>
+    <p>${t('winP2',{w:LIN.wins,n:LIN.scars.length,m:maxScars()})}</p>
+    <p><b>${t('gloryGain',{n:gl,t:LEG.glory})}</b></p>
+    <div class="sig">DESIGNED &amp; CODED BY <b>YAMADA DEV</b> — 𒉭 — 2026</div><br><br>
+    <button class="btn" onclick="goCreate()">${t('newGlad',{g:LIN.gen})}</button>
+    <div style="height:12px"></div>
+    <button class="btn ghost" onclick="goLegacy()">${t('legacyBtn')} ★ ${LEG.glory}</button>
+    <div style="height:12px"></div>
+    <button class="btn ghost" onclick="toMenu()">${t('toMenu')}</button>`;
+  S.active=false; show('sWin');
+}
+
+/* =====================================================================
+   18. INICIALIZAÇÃO
+   ===================================================================== */
+LANG = detectLang();
+loadLeg();
+fxInit();
+loadLin();
+loadLook();
+applyLang();
+
+function refreshSprite(f){
+  const L = f.limbs, mask = (L.armR.lost?1:0) | (L.armL.lost?2:0) | (L.legR.lost?4:0) | (L.legL.lost?8:0);
+  const pct = f.hp/f.maxHp, w = pct<.3 ? 2 : (pct<.6 ? 1 : 0), key = mask+'|'+w;
+  if(f._sk===key) return;
+  f._sk = key;
+  f.el._img.src = spriteUrl(f.sid, { armR:!!L.armR.lost, armL:!!L.armL.lost, legR:!!L.legR.lost, legL:!!L.legL.lost }, w, f.look);
+}
+
+/* =====================================================================
+   COMBATE: golpes variados, status, esquiva, combo e IA dos campeões
+   ===================================================================== */
+const newSt = () => ({ bleed:0, burn:0, stun:0 });
+
+/* sangramento, queimadura e atordoamento */
+function addStatus(f,kind,dur){
+  if(kind==='stun' && f.stunRes && Math.random()<f.stunRes){ floatText(f,t('immune'),'info'); return; }
+  const had = f.st[kind]>0;
+  f.st[kind] = Math.max(f.st[kind],dur);
+  if(!had){
+    log(t(kind==='bleed' ? 'logBleed' : (kind==='burn' ? 'logBurnOn' : 'logStun'),{d:f.name}),'l-crit');
+    floatText(f,t('stat_'+kind),'info');
+  }
+}
+/* fim de cada rodada: danos de status; chuva apaga queimaduras */
+function statusTick(){
+  [S.player,S.enemy].forEach(f=>{
+    if(f.hp<=0) return;
+    const res = f.isP ? (1 - .15*LEG.ranks.resist) : 1;
+    if(f.st.bleed>0){
+      const n = dealDamage(f, Math.max(1,Math.round(4*res)), { type:'blade', status:true });
+      log(t('logBleedTick',{f:f.name,n}),'l-dmg'); f.st.bleed--;
+    }
+    if(f.hp>0 && f.st.burn>0){
+      if(S.weather==='rain'){ f.st.burn=0; log(t('logRainOut',{f:f.name}),'l-sys'); }
+      else{
+        const n = dealDamage(f, Math.max(1,Math.round(5*res)), { type:'fire', status:true });
+        log(t('logBurnTick',{f:f.name,n}),'l-fire'); f.st.burn--;
+      }
+    }
+  });
+}
+function statusHtml(f){
+  let h='';
+  ['bleed','burn','stun'].forEach(k=>{ if(f.st[k]>0) h += `<span class="sbadge ${k}">${t('stat_'+k)} ${f.st[k]}</span>`; });
+  if((f.combo||0)>=2) h += `<span class="sbadge combo">${t('combo')} x${f.combo}</span>`;
+  if(f.evade) h += `<span class="sbadge stun">${t('floatDodge')}</span>`;
+  return h ? `<div>${h}</div>` : '';
+}
+
+/* golpe corpo a corpo: o = { free, heavy, mult, acc, stun, noEvade, noCounter } */
+function melee(a,d,o){
+  o = o || {};
+  if(!o.free) a.sta -= COST.attack;
+  sfx(o.heavy ? 'heavy' : 'swing');
+  lunge(a);
+  // esquiva (postura do jogador ou habilidade natural, como a de Nyx)
+  const dodgeP = d.evade ? .75 : (d.dodge||0);
+  if(!o.noEvade && dodgeP>0 && Math.random()<dodgeP){
+    log(t('logDodged',{d:d.name,a:a.name})); floatText(d,t('floatDodge'),'info'); sfx('miss'); a.combo = 0;
+    if(d.evade && d.hp>0 && a.hp>0){
+      log(t('logCounter',{d:d.name,a:a.name}),'l-hit');
+      melee(d,a,{ free:true, mult:.5, noEvade:true, noCounter:true });
+    }
+    return false;
+  }
+  const chance = clamp(.8 + (a.agi-d.agi)*.03 - (S.weather==='sand' ? .1 : 0) + (o.acc||0), .3, .95);
+  if(Math.random() > chance){
+    log(t('logMiss',{a:a.name,d:d.name})); sfx('miss');
+    floatText(d,t('miss'),'info'); a.combo = 0;
+    if(a.isP) S.favor = clamp(S.favor-1,0,100);
+    return false;
+  }
+  let dmg = (6 + a.pow*2 + rnd(0,5)) * dmgMult(a) * (o.mult||1) * (a.fury ? 1.4 : 1) * (1 + .1*Math.min(a.combo||0,4));
+  const crit = Math.random() < clamp(.08 + a.agi*.01, .08, .4);
+  if(crit) dmg *= 1.6;
+  const n = dealDamage(d, dmg, { type:'blade', melee:true, crit });
+  sfx(d.def ? 'defend' : (crit ? 'crit' : 'hit'));
+  log(t(crit?'logCrit':'logHit',{a:a.name,d:d.name,n,g:d.def?t('guarded'):''}), crit?'l-crit':(a.isP?'l-hit':'l-dmg'));
+  a.combo = (a.combo||0) + 1; d.combo = 0;
+  if(a.combo>=3){ log(t('logCombo',{n:a.combo}),'l-crit'); floatText(a,'x'+a.combo,'crit'); }
+  if(a.isP) S.favor = clamp(S.favor + (crit?4:2), 0, 100);
+  if(crit && d.hp>0){ limbHit(d,n); addStatus(d,'bleed',3); }
+  if(o.stun && d.hp>0 && Math.random()<o.stun) addStatus(d,'stun',1);
+  if(a.bleedOnHit && d.hp>0 && Math.random()<a.bleedOnHit) addStatus(d,'bleed',3);
+  // o cavaleiro contra-ataca quando está em guarda
+  if(d.def && d.counterOnGuard && d.hp>0 && a.hp>0 && !o.noCounter && Math.random()<.5){
+    log(t('logCounter',{d:d.name,a:a.name}),'l-hit');
+    melee(d,a,{ free:true, mult:.6, noEvade:true, noCounter:true });
+  }
+  return true;
+}
+function castFire(a,d){
+  a.sta -= COST.magic; burst(d); sfx('magic');
+  const dmg = (12 + a.pow + rnd(0,6)) * dmgMult(a) * (S.weather==='rain' ? .75 : 1);
+  const n = dealDamage(d, dmg, { type:'fire' });
+  log(t('logFire',{a:a.name,n,d:d.name}),'l-fire');
+  if(a.isP) S.favor = clamp(S.favor+2,0,100);
+  if(d.hp>0 && Math.random()<(a.burnOnFire||.35)) addStatus(d,'burn',3);
+}
+
+/* ---------- Novas ações do jogador ---------- */
+function doHeavy(){
+  if(!guard()) return;
+  const p=S.player, e=S.enemy; if(p.sta<COST.heavy) return;
+  if(dist(p,e)>ATK_RANGE){ log(t('msgTargetFar'),'l-sys'); return; }
+  p.sta -= COST.heavy; log(t('logHeavy',{a:p.name}),'l-hit');
+  melee(p,e,{ free:true, heavy:true, mult:1.75, acc:-.12, stun:.35 });
+  endPlayerTurn();
+}
+function doQuick(){
+  if(!guard()) return;
+  const p=S.player, e=S.enemy; if(p.sta<COST.quick) return;
+  if(dist(p,e)>ATK_RANGE){ log(t('msgTargetFar'),'l-sys'); return; }
+  p.sta -= COST.quick; log(t('logQuick',{a:p.name}),'l-hit');
+  melee(p,e,{ free:true, mult:.55 });
+  if(e.hp>0) melee(p,e,{ free:true, mult:.55 });
+  endPlayerTurn();
+}
+function doDodge(){
+  if(!guard()) return;
+  const p=S.player; if(p.sta<COST.dodge) return;
+  p.sta -= COST.dodge; p.evade = true; sfx('rest');
+  log(t('logDodgeStance',{p:p.name}));
+  endPlayerTurn();
+}
+/* início do turno do jogador: atordoado perde a vez */
+function startPlayerTurn(){
+  const p=S.player, run=S.run;
+  if(p.st.stun>0){
+    p.st.stun--; log(t('logStunnedP',{p:p.name}),'l-crit'); floatText(p,t('stat_stun'),'info');
+    S.busy = true; render();
+    setTimeout(()=>{ if(run!==S.run) return; endPlayerTurn(); },800);
+    return;
+  }
+  S.busy = false; render();
+}
+
+/* ---------- IA dos campeões ---------- */
+function approach(e,p){
+  let best=null, bs=dist(e,p)-.01;
+  for(let c=0;c<COLS;c++) for(let r=0;r<ROWS;r++){
+    if(!canMoveTo(e,c,r) || e.sta<moveCost(e,c,r)) continue;
+    const s = Math.hypot(c-p.c,r-p.r) + (isFire(c)?6:0) + (terrainAt(c,r)==='mud' ? .7 : (terrainAt(c,r)==='drift' ? .3 : 0));
+    if(s<bs){ bs=s; best=[c,r]; }
+  }
+  if(!best) return false;
+  e.sta -= moveCost(e,best[0],best[1]); moveFighter(e,best[0],best[1]);
+  log(t('logAdvance',{e:e.name,c:best[0]+1,r:best[1]+1}));
+  return true;
+}
+/* a feiticeira pisca para longe e castiga de distância */
+function mageTurn(e,p,d){
+  if(d<=ATK_RANGE){
+    if(e.sta>=12 && Math.random()<.55){
+      let best=null, bs=-1;
+      for(let c=0;c<COLS;c++) for(let r=0;r<ROWS;r++){
+        if(pillarAt(c,r) || occupied(c,r,e) || Math.hypot(c-e.c,r-e.r)>3.6) continue;
+        const dd = Math.hypot(c-p.c,r-p.r) - (isFire(c)?5:0);
+        if(dd>bs){ bs=dd; best=[c,r]; }
+      }
+      if(best){ e.sta-=12; burst(e); e.c=best[0]; e.r=best[1]; sfx('magic'); log(t('logBlink',{e:e.name}),'l-fire'); return; }
+    }
+    if(e.sta>=COST.attack){ melee(e,p,{ mult:.7 }); return; }
+    rest(e); return;
+  }
+  if(d<=magicRange() && e.sta>=COST.magic && Math.random()<.8){ castFire(e,p); return; }
+  if(moveRange(e)>0 && e.sta>=moveCost(e) && approach(e,p)) return;
+  if(d<=magicRange() && e.sta>=COST.magic){ castFire(e,p); return; }
+  rest(e);
+}
+function enemyTurn(){
+  const e=S.enemy, p=S.player;
+  e.def=false; e.evade=false;
+  if(e.st.stun>0){ e.st.stun--; log(t('logStunned',{e:e.name}),'l-sys'); floatText(e,t('stat_stun'),'info'); return; }
+  if(e.ai==='berserker' && !e.fury && e.hp<e.maxHp*.5){
+    e.fury=true; log(t('logFury',{e:e.name}),'l-crit'); floatText(e,t('fury'),'crit'); sfx('gong'); shake(2);
+  }
+  const d = dist(e,p), ai = e.ai;
+  if(ai==='mage'){ mageTurn(e,p,d); return; }
+  if(d<=ATK_RANGE){
+    if(e.sta<COST.attack){ rest(e); return; }
+    const r = Math.random();
+    const gd = ai==='tank' ? .25 : (ai==='knight' ? .35 : (ai==='berserker' ? 0 : .15));
+    if(r<gd && e.sta>=COST.defend){ e.def=true; e.sta-=COST.defend; log(t('logGuardE',{e:e.name})); return; }
+    if(ai==='emperor' && r>.8 && e.sta>=COST.magic){ castFire(e,p); return; }
+    if((ai==='brute' || ai==='tank' || ai==='berserker' || ai==='emperor') && e.sta>=COST.heavy && Math.random()<.2){
+      e.sta -= COST.heavy; log(t('logHeavy',{a:e.name}),'l-dmg');
+      melee(e,p,{ free:true, heavy:true, mult:1.75, acc:-.12, stun:.35 }); return;
+    }
+    melee(e,p);
+    if(ai==='agile' && p.hp>0 && Math.random()<.3){ log(t('logDagger',{e:e.name})); melee(e,p,{ free:true, mult:.5 }); }
+    if(ai==='berserker' && e.fury && p.hp>0 && Math.random()<.5){ melee(e,p,{ free:true, mult:.6 }); }
+    return;
+  }
+  // longe: magia, aproximação ou descanso
+  if(d<=magicRange() && e.sta>=COST.magic && Math.random()<(ai==='emperor' ? .45 : .22)){ castFire(e,p); return; }
+  if(moveRange(e)>0 && e.sta>=moveCost(e) && approach(e,p)) return;
+  if(d<=magicRange() && e.sta>=COST.magic){ castFire(e,p); return; }
+  rest(e);
+}
+
+</script>
+</body>
+</html>
